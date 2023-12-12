@@ -4,92 +4,93 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
+// import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {useEffect, useState} from "react";
+// import Link from '@mui/material/Link';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {ProductListDto} from "../../../../data/dto/ProductDto.ts";
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
+type Props = {
+    productList: ProductListDto[];
 }
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+// function Copyright() {
+//     return (
+//         <Typography variant="body2" color="text.secondary" align="center">
+//             {'Copyright © '}
+//             <Link color="inherit" href="https://mui.com/">
+//                 Your Website
+//             </Link>{' '}
+//             {new Date().getFullYear()}
+//             {'.'}
+//         </Typography>
+//     );
+// }
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function ProductCard() {
-
-    const [productList, setProductList] = useState<ProductListDto[] | undefined>(undefined);
-
-    useEffect(()=>{
-
-    },[])
+export default function ProductCard({productList}: Props) {
 
     return (
         <ThemeProvider theme={defaultTheme}>
             <main>
-                <Container sx={{ py: 5 }} maxWidth="xl">
+                <Container sx={{py: 5}} maxWidth="xl">
                     {/* End hero unit */}
                     <Grid container spacing={4}>
-                        {cards.map((card) => (
-                            <Grid item key={card} xs={12} sm={6} md={3}>
-                                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+
+                        {productList.map((item) => (
+                            <Grid item key={item.pid} xs={12} sm={6} md={3}>
+                                <Card sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
                                     <CardMedia
                                         component="div"
                                         sx={{
                                             // 16:9
-                                            pt: '56.25%',
+                                            pt: '100%',
                                         }}
-                                        image="https://image.api.playstation.com/vulcan/ap/rnd/202306/1219/e66c4ae18c5d8e3986a24599b293162a6f5c9eba22968d2c.jpg?w=620&thumb=false"
+                                        image={item.image_url}
                                     />
-                                    <CardContent sx={{ flexGrow: 1 }}>
-                                        <Typography gutterBottom variant="h5" component="h2">
-                                            Heading
+                                    <CardContent sx={{flexGrow: 1}}>
+                                        <Typography gutterBottom variant="h5" component="h2" noWrap>
+                                            {item.name}
                                         </Typography>
                                         <Typography>
-                                            This is a media card. You can use this section to describe the
-                                            content.
+                                            HKD ${item.price}
                                         </Typography>
                                     </CardContent>
-                                    <CardActions>
-                                        <Button size="small">View</Button>
-                                        <Button size="small">Edit</Button>
+                                    <CardActions sx={{padding: "0px 12px 16px"}}>
+                                        <Button variant="contained"
+                                                size="small"
+                                                sx={{textTransform: 'none', borderRadius: '16px', fontSize: '11px',
+                                                    '&:hover': {
+                                                        boxShadow: 'inset 0 0 0 2px white, 0 0 0 2px rgb(25,118,210)'
+                                                    }
+                                                }}>Find out more</Button>
                                     </CardActions>
                                 </Card>
                             </Grid>
                         ))}
+
                     </Grid>
                 </Container>
             </main>
 
             {/* Footer */}
-            <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-                <Typography variant="h6" align="center" gutterBottom>
-                    Footer
-                </Typography>
-                <Typography
-                    variant="subtitle1"
-                    align="center"
-                    color="text.secondary"
-                    component="p"
-                >
-                    Something here to give the footer a purpose!
-                </Typography>
-                <Copyright />
-            </Box>
+            {/*<Box sx={{bgcolor: 'background.paper', p: 6}} component="footer">*/}
+            {/*    <Typography variant="h6" align="center" gutterBottom>*/}
+            {/*        Footer*/}
+            {/*    </Typography>*/}
+            {/*    <Typography*/}
+            {/*        variant="subtitle1"*/}
+            {/*        align="center"*/}
+            {/*        color="text.secondary"*/}
+            {/*        component="p"*/}
+            {/*    >*/}
+            {/*        Something here to give the footer a purpose!*/}
+            {/*    </Typography>*/}
+            {/*    <Copyright/>*/}
+            {/*</Box>*/}
             {/* End footer */}
 
         </ThemeProvider>
