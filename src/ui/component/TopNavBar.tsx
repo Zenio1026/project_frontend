@@ -14,11 +14,13 @@ import MenuItem from '@mui/material/MenuItem';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import {alpha, InputBase, styled} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+import {useNavigate} from "react-router-dom";
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Shopping Cart', 'Logout'];
 
 function TopNavBar() {
+    const navigate = useNavigate();
+
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -37,23 +39,23 @@ function TopNavBar() {
         setAnchorElUser(null);
     };
 
-    const Search = styled('div')(({ theme }) => ({
+    const Search = styled('div')(({theme}) => ({
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.15),
+        backgroundColor: alpha(theme.palette.common.white, 0),
         '&:hover': {
             backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
         marginLeft: 0,
         marginRight: theme.spacing(2),
-        width: '150px',
+        width: '48px',
         [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(1),
+            marginLeft: theme.spacing(2),
             width: 'auto',
         },
     }));
 
-    const SearchIconWrapper = styled('div')(({ theme }) => ({
+    const SearchIconWrapper = styled('div')(({theme}) => ({
         padding: theme.spacing(0, 2),
         height: '100%',
         position: 'absolute',
@@ -63,7 +65,7 @@ function TopNavBar() {
         justifyContent: 'center',
     }));
 
-    const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    const StyledInputBase = styled(InputBase)(({theme}) => ({
         color: 'inherit',
         width: '100%',
         '& .MuiInputBase-input': {
@@ -72,7 +74,7 @@ function TopNavBar() {
             paddingLeft: `calc(1em + ${theme.spacing(4)})`,
             transition: theme.transitions.create('width'),
             [theme.breakpoints.up('sm')]: {
-                width: '12ch',
+                width: '0',
                 '&:focus': {
                     width: '20ch',
                 },
@@ -81,7 +83,7 @@ function TopNavBar() {
     }));
 
     return (
-        <AppBar position="sticky" sx={{backgroundColor: 'black'}}>
+        <AppBar position='sticky' sx={{backgroundColor: 'black'}}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <SportsEsportsIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
@@ -89,7 +91,6 @@ function TopNavBar() {
                         variant="h6"
                         noWrap
                         component="a"
-                        href="#app-bar-with-responsive-menu"
                         sx={{
                             mr: 2,
                             display: {xs: 'none', md: 'flex'},
@@ -97,9 +98,8 @@ function TopNavBar() {
                             fontWeight: 700,
                             color: 'inherit',
                             textDecoration: 'none'
-                        }}
-                    >
-                        Game-Shop
+                        }}>
+                        GameStation
                     </Typography>
 
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
@@ -129,13 +129,14 @@ function TopNavBar() {
                             onClose={handleCloseNavMenu}
                             sx={{
                                 display: {xs: 'block', md: 'none'},
-                            }}
-                        >
-                            {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center">{page}</Typography>
-                                </MenuItem>
-                            ))}
+                            }}>
+
+                            <MenuItem onClick={() => {
+                                navigate("/")
+                            }}>
+                                <Typography textAlign="center">Products</Typography>
+                            </MenuItem>
+
                         </Menu>
                     </Box>
                     <SportsEsportsIcon sx={{display: {xs: 'flex', md: 'none'}, mr: 1}}/>
@@ -154,27 +155,27 @@ function TopNavBar() {
                             textDecoration: 'none',
                         }}
                     >
-                        Game-Shop
+                        GameStation
                     </Typography>
+
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                        {pages.map((page) => (
-                            <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                {page}
-                            </Button>
-                        ))}
+                        <Button
+                            onClick={() => {
+                                navigate("/")
+                            }}
+                            sx={{my: 2, color: 'white', display: 'block'}}
+                        >
+                            Products
+                        </Button>
                     </Box>
 
                     <Search>
                         <SearchIconWrapper>
-                            <SearchIcon />
+                            <SearchIcon/>
                         </SearchIconWrapper>
                         <StyledInputBase
-                            placeholder="Search"
-                            inputProps={{ 'aria-label': 'search' }}
+                            placeholder="Search..."
+                            inputProps={{'aria-label': 'search'}}
                         />
                     </Search>
 

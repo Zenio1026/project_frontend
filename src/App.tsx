@@ -3,6 +3,7 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ProductListing from "./ui/page/ProductListing";
 import ErrorPage from "./ui/page/ErrorPage";
 import ProductDetail from './ui/page/ProductDetail';
+import LoginPage from "./ui/page/LoginPage";
 
 function App() {
 
@@ -12,10 +13,6 @@ function App() {
       element: <ProductListing/>
     },
     {
-      path: "/error",
-      element: <ErrorPage/>
-    },
-    {
       path: "/product/:productId",
       element: <ProductDetail/>
     },
@@ -23,10 +20,10 @@ function App() {
     //   path: "/shoppingcart",
     //   element: <ShoppingCart/>
     // },
-    // {
-    //   path: "/login",
-    //   element: <LoginPage/>
-    // },
+    {
+      path: "/login",
+      element: <LoginPage/>
+    },
     // {
     //   path: "/checkout/:transactionId",
     //   element: <Checkout/>
@@ -35,6 +32,10 @@ function App() {
     //   path: "/thankyou",
     //   element: <ThankYou/>
     // }
+    {
+      path: "/error",
+      element: <ErrorPage/>
+    }
   ])
 
   return (
