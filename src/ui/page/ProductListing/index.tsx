@@ -3,29 +3,36 @@ import ProductCard from "./component/ProductCard.tsx";
 import {useEffect, useState} from "react";
 import {ProductListDto} from "../../../data/dto/ProductDto.ts";
 import Loading from "../../component/Loading.tsx";
-import * as GetAllProduct from "../../../api/GetAllProduct.ts"
+import * as GetAllProductApi from "../../../api/GetAllProduct.ts"
+import {useNavigate} from "react-router-dom";
+import ProductDetail from "../ProductDetail";
 
 export default function ProductListing() {
     const [productList, setProductList] = useState<ProductListDto[] | undefined>(undefined);
+     const navigate = useNavigate();
+
+    const getAllProduct = async () => {
+        try {
+            const data = await GetAllProductApi.getAllProduct();
+            setProductList(data)
+        } catch (err) {
+            navigate("/error")
+        }
+    }
 
     useEffect(() => {
-        const fetchData = async () => {
-            const products = await GetAllProduct.getAllProduct();
-            setProductList(products)
-            console.log(products)
-        };
-        fetchData();
-
+        getAllProduct();
     }, []);
 
 
     return (
         <>
             <TopNavBar/>
-            {
-                productList ?
-                    <ProductCard productList={productList}/> : <Loading/>
-            }
+            {/*{*/}
+            {/*    productList ?*/}
+            {/*        <ProductCard productList={productList}/> : <Loading/>*/}
+            {/*}*/}
+            <ProductDetail/>
         </>
     )
 }

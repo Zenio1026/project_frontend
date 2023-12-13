@@ -1,6 +1,8 @@
 import './App.css'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ProductListing from "./ui/page/ProductListing";
+import ErrorPage from "./ui/page/ErrorPage";
+import ProductDetail from './ui/page/ProductDetail';
 
 function App() {
 
@@ -9,10 +11,14 @@ function App() {
       path: "/",
       element: <ProductListing/>
     },
-    // {
-    //   path: "/product/:productId/:userId",
-    //   element: <ProductDetail/>
-    // },
+    {
+      path: "/error",
+      element: <ErrorPage/>
+    },
+    {
+      path: "/product/:productId",
+      element: <ProductDetail/>
+    },
     // {
     //   path: "/shoppingcart",
     //   element: <ShoppingCart/>
