@@ -1,6 +1,4 @@
-import {ThemeProvider} from "@emotion/react";
 import {Grid, Paper} from "@mui/material";
-import {createTheme} from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -17,9 +15,6 @@ import Hidden from "@mui/material/Hidden";
 type Params = {
     productId: string
 }
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
 
 export default function ProductDetail() {
     const {productId} = useParams<Params>();
@@ -61,137 +56,139 @@ export default function ProductDetail() {
 
     return (
         <>
-            <ThemeProvider theme={defaultTheme}>
-                <Box sx={{height: "100vh", overflow: "hidden"}}>
+            <Box sx={{height: "100vh", overflow: "hidden"}}>
 
-                    <TopNavBar/>
+                <TopNavBar/>
 
-                    {productDetail ? (
-                        <Grid container component="main" sx={{height: '100vh'}}>
-                            <Hidden xsDown>
-                                <Grid
-                                    item
-                                    xs={false}
-                                    sm={4}
-                                    md={7}
-                                    sx={{
-                                        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0), rgba(19,19,19,0.5), rgba(38,38,38,1)),
-                                          url(${productDetail.image_url})`,
-                                        backgroundRepeat: "no-repeat",
-                                        backgroundSize: "cover",
-                                        backgroundPosition: "center",
-                                        // backgroundColor: (t) =>
-                                        //     t.palette.mode === "light"
-                                        //         ? t.palette.grey[50]
-                                        //         : t.palette.grey[900],
-                                        // transition: "background-color 0.5s"
-                                    }}/>
-                            </Hidden>
-
-                            <Hidden smUp>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sx={{
-                                        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0), rgba(19,19,19,0.5), rgba(38,38,38,1)),
-                                          url(${productDetail.image_url})`,
-                                        backgroundRepeat: "no-repeat",
-                                        backgroundSize: "cover",
-                                        backgroundPosition: "center",
-                                        // backgroundColor: (t) =>
-                                        //     t.palette.mode === "light"
-                                        //         ? t.palette.grey[50]
-                                        //         : t.palette.grey[900],
-                                        // transition: "background-color 0.5s"
-                                    }}/>
-                            </Hidden>
-
+                {productDetail ? (
+                    <Grid container component="main" sx={{height: '100vh'}}>
+                        <Hidden xsDown>
                             <Grid
-                                item xs={12}
-                                sm={8}
-                                md={5}
-                                component={Paper}
-                                elevation={6}
-                                square
+                                item
+                                xs={false}
+                                sm={4}
+                                md={7}
                                 sx={{
-                                    backgroundImage: "linear-gradient(to right, rgb(30,30,30), rgba(25,25,25))",
-                                    padding: '48px',
-                                    // transition: "background-color 0.5s",
-                                }}>
+                                    backgroundImage: `linear-gradient(to right, rgba(0,0,0,0), rgba(19,19,19,0.5), rgba(38,38,38,1)), url(${productDetail.image_url})`,
+                                    backgroundRepeat: "no-repeat",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                    // backgroundColor: (t) =>
+                                    //     t.palette.mode === "light"
+                                    //         ? t.palette.grey[50]
+                                    //         : t.palette.grey[900],
+                                    // transition: "background-color 0.5s"
+                                }}
+                            />
+                        </Hidden>
 
-                                <Box
-                                    sx={{
-                                        my: 8,
-                                        mx: 4,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "center",
-                                        color: "white",
-                                        height: "75%",
-                                    }}
+                        <Hidden smUp>
+                            <Grid
+                                item
+                                xs={12}
+                                sx={{
+                                    backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0), rgba(19,19,19,0.5), rgba(38,38,38,1)), url(${productDetail.image_url})`,
+                                    backgroundRepeat: "no-repeat",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                    // backgroundColor: (t) =>
+                                    //     t.palette.mode === "light"
+                                    //         ? t.palette.grey[50]
+                                    //         : t.palette.grey[900],
+                                    // transition: "background-color 0.5s"
+                                }}
+                            />
+                        </Hidden>
+
+                        <Grid
+                            item
+                            xs={12}
+                            sm={8}
+                            md={5}
+                            component={Paper}
+                            elevation={6}
+                            square
+                            sx={{
+                                backgroundImage: "linear-gradient(to right, rgb(30,30,30), rgba(25,25,25))",
+                                padding: '48px',
+                                // transition: "background-color 0.5s",
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    my: 8,
+                                    mx: 4,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    height: "75%",
+                                }}
+                            >
+                                <Typography
+                                    gutterBottom
+                                    variant="h3"
+                                    sx={{marginBottom: "4px"}}
                                 >
-                                    <Typography gutterBottom
-                                                variant="h3"
-                                                sx={{marginBottom: "4px"}}>
-                                        {productDetail.name}
-                                    </Typography>
+                                    {productDetail.name}
+                                </Typography>
 
-                                    <Typography sx={{
+                                <Typography
+                                    sx={{
                                         marginBottom: "128px",
                                         marginLeft: "2px",
                                         color: "rgba(255, 255, 255, 0.5)"
-                                    }}>
-                                        {productDetail.description}
-                                    </Typography>
+                                    }}
+                                >
+                                    {productDetail.description}
+                                </Typography>
 
-                                    <Typography variant="h6"
-                                                sx={{
-                                                    my: 2,
-                                                    textAlign: "right",
-                                                    marginRight: "12px",
-                                                }}>
-                                        HK${productDetail.price.toFixed(2)}
-                                    </Typography>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        my: 2,
+                                        textAlign: "right",
+                                        marginRight: "12px",
+                                    }}
+                                >
+                                    HK${productDetail.price.toFixed(2)}
+                                </Typography>
 
-                                    <Grid
-                                        container
-                                        direction="column"
-                                        justifyContent="flex-end"
-                                        alignItems="flex-end"
+                                <Grid
+                                    container
+                                    direction="column"
+                                    justifyContent="flex-end"
+                                    alignItems="flex-end"
+                                >
+                                    <QuantitySelector
+                                        quantity={quantity}
+                                        handleMinus={handleMinus}
+                                        handlePlus={handlePlus}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        sx={{
+                                            mt: 3,
+                                            mb: 2,
+                                            textTransform: "none",
+                                            borderRadius: "24px",
+                                            fontSize: "16px",
+                                            fontWeight: "bold",
+                                            backgroundColor: "rgb(214,61,0)",
+                                            width: "300px",
+                                        }}
                                     >
-                                        <QuantitySelector
-                                            quantity={quantity}
-                                            handleMinus={handleMinus}
-                                            handlePlus={handlePlus}
-                                        />
-
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            sx={{
-                                                mt: 3,
-                                                mb: 2,
-                                                textTransform: "none",
-                                                borderRadius: "24px",
-                                                fontSize: "16px",
-                                                fontWeight: "bold",
-                                                backgroundColor: "rgb(214,61,0)",
-                                                width: "300px",
-                                            }}
-                                        >
-                                            Add to Cart
-                                        </Button>
-                                    </Grid>
-
-
-                                </Box>
-                            </Grid>
+                                        Add to Cart
+                                    </Button>
+                                </Grid>
+                            </Box>
                         </Grid>
-                    ) : (
-                        <Loading/>
-                    )}
-                </Box>
-            </ThemeProvider>
+                    </Grid>
+                ) : (
+                    <Loading/>
+                )}
+            </Box>
         </>
     );
 }

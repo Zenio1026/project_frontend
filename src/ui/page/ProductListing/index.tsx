@@ -14,7 +14,8 @@ export default function ProductListing() {
         try {
             const data = await GetAllProductApi.getAllProduct();
             setProductList(data)
-        } catch (err) {
+            document.title = "GameStation"
+        } catch (e) {
             navigate("/error")
         }
     }

@@ -11,22 +11,40 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-import {alpha, InputBase, styled} from "@mui/material";
+import Login from '@mui/icons-material/Login';
+import Logout from '@mui/icons-material/Logout';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import {alpha, Divider, InputBase, ListItemIcon, styled} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import {useNavigate} from "react-router-dom";
 import {useContext} from "react";
 import {LoginUserContext} from "../../App.tsx";
+import * as FirebaseAuthService from "../../authService/FirebaseAuthService.ts"
 
-const settings = ['Shopping Cart', 'Logout'];
+const paperStyles = {
+    elevation: 0,
+    overflow: 'visible',
+    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+    mt: "48px",
+    '&:before': {
+        content: '""',
+        display: 'block',
+        position: 'absolute',
+        top: 0,
+        right: 14,
+        width: 10,
+        height: 10,
+        backgroundColor: 'background.paper',
+        transform: 'translateY(-50%) rotate(45deg)',
+        zIndex: 0,
+    },
+};
 
-function TopNavBar() {
+export default function TopNavBar() {
     const navigate = useNavigate();
     const loginUser = useContext(LoginUserContext);
-
-    // const renderLoginContainer = () => {
-    //
-    // }
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -34,12 +52,13 @@ function TopNavBar() {
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElUser(event.currentTarget);
-    };
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
+    };
+
+    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorElUser(event.currentTarget);
     };
 
     const handleCloseUserMenu = () => {
@@ -54,7 +73,7 @@ function TopNavBar() {
             backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
         marginLeft: 0,
-        marginRight: theme.spacing(2),
+        marginRight: theme.spacing(1),
         width: '48px',
         [theme.breakpoints.up('sm')]: {
             marginLeft: theme.spacing(2),
@@ -89,6 +108,19 @@ function TopNavBar() {
         },
     }));
 
+    const handleLoginClick = () => {
+        navigate("/login")
+    };
+
+    const handleLogoutClick = () => {
+        FirebaseAuthService.handleSignOut();
+        navigate("/")
+    };
+
+    const handleShoppingCartClick = () => {
+        navigate("/shoppingcart")
+    }
+
     return (
         <AppBar position='sticky' sx={{backgroundColor: 'black'}}>
             <Container maxWidth="xl">
@@ -105,7 +137,8 @@ function TopNavBar() {
                             fontWeight: 700,
                             color: 'inherit',
                             textDecoration: 'none'
-                        }}>
+                        }}
+                    >
                         GameStation
                     </Typography>
 
@@ -138,9 +171,11 @@ function TopNavBar() {
                                 display: {xs: 'block', md: 'none'},
                             }}>
 
-                            <MenuItem onClick={() => {
-                                navigate("/")
-                            }}>
+                            <MenuItem
+                                key="goHome"
+                                onClick={() => {
+                                    navigate("/")
+                                }}>
                                 <Typography textAlign="center">Products</Typography>
                             </MenuItem>
 
@@ -178,49 +213,84 @@ function TopNavBar() {
 
                     <Search>
                         <SearchIconWrapper>
-                            <SearchIcon/>
+                            <SearchIcon style={{fontSize: '28px'}}/>
                         </SearchIconWrapper>
                         <StyledInputBase
+                            name="search"
                             placeholder="Search..."
                             inputProps={{'aria-label': 'search'}}
                         />
                     </Search>
 
-                    {/*loginUser  here */}
+                    {/* ----- loginMenu -----*/}
                     <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
-                            </IconButton>
+                            {
+                                loginUser ? (
+                                    <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                        <Avatar alt={loginUser.email} src="/"
+                                                sx={{width: 36, height: 36, fontSize: '20px'}}/>
+                                    </IconButton>
+                                ) : loginUser === null ? (
+                                    <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                        <AccountCircleIcon style={{color: 'grey', width: 36, height: 36}}/>
+                                    </IconButton>
+                                ) : (
+                                    <Box sx={{display: 'flex'}}>
+                                        <Avatar alt="  " src="/"
+                                                sx={{width: 36, height: 36, fontSize: '20px'}}/>
+                                    </Box>
+                                )
+                            }
                         </Tooltip>
+
                         <Menu
-                            sx={{mt: '45px'}}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
+                            anchorOrigin={{vertical: 'top', horizontal: 'right'}}
                             keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
+                            transformOrigin={{vertical: 'top', horizontal: 'right'}}
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
+                            slotProps={{paper: {elevation: 0, sx: paperStyles}}}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
+                            {loginUser ? (
+                                [
+                                    <MenuItem key="avatar">
+                                        <ListItemIcon>
+                                            <AccountCircleIcon style={{color: 'grey', width: 24, height: 24}}/>
+                                        </ListItemIcon>
+                                        <Typography textAlign="center">{loginUser.email}</Typography>
+                                    </MenuItem>,
+
+                                    <Divider key="divider"/>,
+
+                                    <MenuItem key="cart" onClick={handleShoppingCartClick}>
+                                        <ListItemIcon>
+                                            <ShoppingCartIcon fontSize="small"/>
+                                        </ListItemIcon>
+                                        <Typography textAlign="center">Shopping Cart</Typography>
+                                    </MenuItem>,
+
+                                    <MenuItem key="sign-out" onClick={handleLogoutClick}>
+                                        <ListItemIcon>
+                                            <Logout fontSize="small"/>
+                                        </ListItemIcon>
+                                        <Typography textAlign="center">Sign Out</Typography>
+                                    </MenuItem>
+                                ]
+                            ) : (
+                                <MenuItem key="sign-in" onClick={handleLoginClick}>
+                                    <ListItemIcon>
+                                        <Login fontSize="small"/>
+                                    </ListItemIcon>
+                                    <Typography textAlign="center">Sign In</Typography>
                                 </MenuItem>
-                            ))}
+                            )}
                         </Menu>
                     </Box>
-
                 </Toolbar>
             </Container>
         </AppBar>
     );
 }
-
-export default TopNavBar;

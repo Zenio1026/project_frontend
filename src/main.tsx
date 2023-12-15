@@ -10,14 +10,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   // <React.StrictMode>
     <>
         <App/>
-        <body>
-        <div>
+        <>
             <div className="wave"></div>
             <div className="wave"></div>
             <div className="wave"></div>
-        </div>
-        </body>
+        </>
     </>
-
     // </React.StrictMode>,
 )

@@ -4,6 +4,7 @@ import ProductListing from "./ui/page/ProductListing";
 import ErrorPage from "./ui/page/ErrorPage";
 import ProductDetail from './ui/page/ProductDetail';
 import LoginPage from "./ui/page/LoginPage";
+import ShoppingCart from "./ui/page/ShoppingCart";
 import {createContext, useEffect, useState} from "react";
 import * as FirebaseAuthService from ".//authService/FirebaseAuthService.ts"
 import {UserData} from "./data/dto/UserDto.ts";
@@ -27,10 +28,10 @@ function App() {
             path: "/product/:productId",
             element: <ProductDetail/>
         },
-        // {
-        //   path: "/shoppingcart",
-        //   element: <ShoppingCart/>
-        // },
+        {
+          path: "/shoppingcart",
+          element: <ShoppingCart/>
+        },
         {
             path: "/login",
             element: <LoginPage/>
