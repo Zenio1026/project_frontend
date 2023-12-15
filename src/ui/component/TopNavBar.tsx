@@ -15,11 +15,18 @@ import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import {alpha, InputBase, styled} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import {useNavigate} from "react-router-dom";
+import {useContext} from "react";
+import {LoginUserContext} from "../../App.tsx";
 
 const settings = ['Shopping Cart', 'Logout'];
 
 function TopNavBar() {
     const navigate = useNavigate();
+    const loginUser = useContext(LoginUserContext);
+
+    // const renderLoginContainer = () => {
+    //
+    // }
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -179,6 +186,7 @@ function TopNavBar() {
                         />
                     </Search>
 
+                    {/*loginUser  here */}
                     <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>

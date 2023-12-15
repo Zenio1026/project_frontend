@@ -1,21 +1,44 @@
-import { ThemeProvider } from "@emotion/react";
+import {ThemeProvider} from "@emotion/react";
 import Container from "@mui/material/Container";
-import {Checkbox, CssBaseline, FormControlLabel, TextField} from "@mui/material";
+import {TextField} from "@mui/material";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {createTheme} from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import TopNavBar from "../../component/TopNavBar.tsx";
+import {useState} from "react";
+import * as FirebaseAuthService from "../../../authService/FirebaseAuthService.ts"
+
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function LoginPage(){
-    return(
+export default function LoginPage() {
+    // const [email, setEmail] = useState<string>();
+    // const [password, setPassword] = useState<string>();
+    //
+    // const navigate
+    //
+    // const handleEmailChange = (event) => {
+    //     setEmail(event.target.value);
+    // }
+    //
+    // const handlePasswordChange = (event) => {
+    //     setPassword(event.target.value);
+    // }
+    //
+    // const handleSubmit = async (event) => {
+    //     event.preventDefault();
+    //     const loginResult = await FirebaseAuthService.handleSignInWithEmailAndPassword();
+    // }
+
+
+    return (
         <ThemeProvider theme={defaultTheme}>
+            <TopNavBar/>
             <Container component="main" maxWidth="xs">
-                <CssBaseline />
                 <Box
                     sx={{
                         marginTop: 8,
@@ -24,13 +47,15 @@ export default function LoginPage(){
                         alignItems: 'center',
                     }}
                 >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
+                    <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+                        <LockOutlinedIcon/>
                     </Avatar>
+
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <Box component="form"  noValidate sx={{ mt: 1 }}>
+
+                    <Box component="form" noValidate sx={{mt: 1}}>
                         <TextField
                             margin="normal"
                             required
@@ -51,19 +76,14 @@ export default function LoginPage(){
                             id="password"
                             autoComplete="current-password"
                         />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
-                        />
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
+                            sx={{mt: 3, mb: 2}}
                         >
                             Sign In
                         </Button>
-
                     </Box>
                 </Box>
             </Container>

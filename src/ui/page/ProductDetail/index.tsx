@@ -45,6 +45,7 @@ export default function ProductDetail() {
         try {
             const response = await ProductApi.getProductDetail(productId);
             setProductDetail(response);
+            document.title = response.name
         } catch (e) {
             navigate("/error");
         }
@@ -67,7 +68,6 @@ export default function ProductDetail() {
 
                     {productDetail ? (
                         <Grid container component="main" sx={{height: '100vh'}}>
-
                             <Hidden xsDown>
                                 <Grid
                                     item
@@ -77,15 +77,14 @@ export default function ProductDetail() {
                                     sx={{
                                         backgroundImage: `linear-gradient(to right, rgba(0,0,0,0), rgba(19,19,19,0.5), rgba(38,38,38,1)),
                                           url(${productDetail.image_url})`,
-                                        // backgroundImage: `url(${productDetail.image_url})`,
                                         backgroundRepeat: "no-repeat",
-                                        backgroundColor: (t) =>
-                                            t.palette.mode === "light"
-                                                ? t.palette.grey[50]
-                                                : t.palette.grey[900],
                                         backgroundSize: "cover",
                                         backgroundPosition: "center",
-                                        transition: "background-color 0.5s"
+                                        // backgroundColor: (t) =>
+                                        //     t.palette.mode === "light"
+                                        //         ? t.palette.grey[50]
+                                        //         : t.palette.grey[900],
+                                        // transition: "background-color 0.5s"
                                     }}/>
                             </Hidden>
 
@@ -97,27 +96,28 @@ export default function ProductDetail() {
                                         backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0), rgba(19,19,19,0.5), rgba(38,38,38,1)),
                                           url(${productDetail.image_url})`,
                                         backgroundRepeat: "no-repeat",
-                                        backgroundColor: (t) =>
-                                            t.palette.mode === "light"
-                                                ? t.palette.grey[50]
-                                                : t.palette.grey[900],
                                         backgroundSize: "cover",
                                         backgroundPosition: "center",
-                                        transition: "background-color 0.5s"
+                                        // backgroundColor: (t) =>
+                                        //     t.palette.mode === "light"
+                                        //         ? t.palette.grey[50]
+                                        //         : t.palette.grey[900],
+                                        // transition: "background-color 0.5s"
                                     }}/>
                             </Hidden>
 
-                            <Grid item xs={12}
-                                  sm={8}
-                                  md={5}
-                                  component={Paper}
-                                  elevation={6}
-                                  square
-                                  sx={{
-                                      backgroundImage: "linear-gradient(to right, rgb(30,30,30), rgba(25,25,25))",
-                                      transition: "background-color 0.5s",
-                                      padding: '48px'
-                                  }}>
+                            <Grid
+                                item xs={12}
+                                sm={8}
+                                md={5}
+                                component={Paper}
+                                elevation={6}
+                                square
+                                sx={{
+                                    backgroundImage: "linear-gradient(to right, rgb(30,30,30), rgba(25,25,25))",
+                                    padding: '48px',
+                                    // transition: "background-color 0.5s",
+                                }}>
 
                                 <Box
                                     sx={{
@@ -139,7 +139,8 @@ export default function ProductDetail() {
                                     <Typography sx={{
                                         marginBottom: "128px",
                                         marginLeft: "2px",
-                                        color: "rgba(255, 255, 255, 0.5)"}}>
+                                        color: "rgba(255, 255, 255, 0.5)"
+                                    }}>
                                         {productDetail.description}
                                     </Typography>
 
@@ -147,7 +148,7 @@ export default function ProductDetail() {
                                                 sx={{
                                                     my: 2,
                                                     textAlign: "right",
-                                                    // marginRight: "100px",
+                                                    marginRight: "12px",
                                                 }}>
                                         HK${productDetail.price.toFixed(2)}
                                     </Typography>

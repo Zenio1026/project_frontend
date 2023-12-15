@@ -5,7 +5,6 @@ import {ProductListDto} from "../../../data/dto/ProductDto.ts";
 import Loading from "../../component/Loading.tsx";
 import * as GetAllProductApi from "../../../api/ProductApi.ts"
 import {useNavigate} from "react-router-dom";
-import LoginPage from "../LoginPage";
 
 export default function ProductListing() {
     const [productList, setProductList] = useState<ProductListDto[] | undefined>(undefined);
@@ -32,7 +31,6 @@ export default function ProductListing() {
                 productList ?
                     <ProductCard productList={productList}/> : <Loading/>
             }
-            {/*<LoginPage/>*/}
         </>
     )
 }
