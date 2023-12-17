@@ -3,6 +3,7 @@ import {firebaseConfig} from "./FirebaseConfig";
 import {
     getAuth,
     GoogleAuthProvider,
+    // OAuthProvider,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signInWithPopup, signOut
@@ -43,6 +44,21 @@ export const handleSignInWithGoogle = async (): Promise<boolean> => {
         return false;
     }
 }
+
+// // https://firebase.google.com/docs/auth/web/apple
+// export const handleSignInWithApple = async (): Promise<boolean> => {
+//     try {
+//         const provider = new OAuthProvider('apple.com');
+//         const auth = getAuth();
+//         await signInWithPopup(auth, provider);
+//         // Signed in
+//         return true;
+//     } catch (error) {
+//         console.log(error);
+//         return false;
+//     }
+// }
+
 
 // https://firebase.google.com/docs/auth/web/start#set_an_authentication_state_observer_and_get_user_data
 export const handleOnAuthStateChanged = (callback: (user: UserData | null) => void) => {

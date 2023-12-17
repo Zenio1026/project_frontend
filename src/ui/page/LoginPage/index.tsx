@@ -127,6 +127,15 @@ export default function LoginPage() {
                         <span>Sign in with Google</span>
                     </GoogleLoginButton>
 
+                    {/*<AppleLoginButton*/}
+                    {/*    style={{borderRadius: '24px', width: '220px'}}*/}
+                    {/*    onClick={() => {*/}
+                    {/*        FirebaseAuthService.handleSignInWithApple()*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <span>Sign in with Apple</span>*/}
+                    {/*</AppleLoginButton>*/}
+
                 </Box>
             </Container>
         </>

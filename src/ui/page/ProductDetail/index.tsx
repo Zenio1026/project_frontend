@@ -10,7 +10,7 @@ import Loading from "../../component/Loading.tsx";
 import * as ProductApi from "../../../api/ProductApi.ts"
 import TopNavBar from "../../component/TopNavBar.tsx";
 import Hidden from "@mui/material/Hidden";
-
+import * as CartItemApi from "../../../api/CartItemApi.ts"
 
 type Params = {
     productId: string
@@ -43,6 +43,12 @@ export default function ProductDetail() {
             document.title = response.name
         } catch (e) {
             navigate("/error");
+        }
+    }
+
+    const handleAddToCart = () => {
+        if (productId) {
+            CartItemApi.putCartItem(productId, quantity);
         }
     }
 
@@ -178,6 +184,7 @@ export default function ProductDetail() {
                                             backgroundColor: "rgb(214,61,0)",
                                             width: "300px",
                                         }}
+                                        onClick={handleAddToCart}
                                     >
                                         Add to Cart
                                     </Button>
