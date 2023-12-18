@@ -35,6 +35,21 @@ export async function getCartItem(): Promise<CartItemListDto[]> {
     }
 }
 
+// Update CartItem
+export async function patchCartItem(pid: number, quantity: number) {
+    try {
+        const accessToken = await FirebaseAuthService.getAccessToken();
+        if (!accessToken) {
+            throw new Error("Access token not available");
+        }
+        const config = {headers: {Authorization: `Bearer ${accessToken}`}};
+        await axios.patch(`${baseUrl}/cart/${pid}/${quantity}`, null, config);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 // Delete CartItem
 export async function deleteCartItem(pid: number) {
     try {

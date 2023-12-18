@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import {useNavigate, useParams} from "react-router-dom";
-import QuantitySelector from "../../component/QuantitySelector.tsx";
+import QuantitySelector from "./component/QuantitySelector.tsx";
 import {useEffect, useState} from "react";
 import {ProductDetailDto} from "../../../data/dto/ProductDto.ts";
 import Loading from "../../component/Loading.tsx";

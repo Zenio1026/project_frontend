@@ -9,38 +9,19 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from "@mui/material/IconButton";
 import {CartItemListDto} from "../../../data/dto/CartItemDto.ts";
 import * as CartItemApi from "../../../api/CartItemApi.ts"
+import * as ProductApi from "../../../api/ProductApi.ts"
 import {useNavigate} from "react-router-dom";
 import {LoginUserContext} from "../../../App.tsx";
-
-// MUI table example
-// interface Column {
-//     id: 'name' | 'code' | 'population' | 'size' | 'density';
-//     label: string;
-//     minWidth?: number;
-//     align?: 'right';
-//     format?: (value: number) => string;
-// }
-// const columns: readonly Column[] = [
-//     {id: 'name', label: 'Picture', minWidth: 170},
-//     {id: 'code', label: 'Name', minWidth: 100},
-//     {id: 'population', label: 'Population', minWidth: 170, align: 'right', format: (value: number) => value.toLocaleString('en-US'),},
-//     {id: 'size', label: 'Size\u00a0(km\u00b2)', minWidth: 170, align: 'right', format: (value: number) => value.toLocaleString('en-US'),},
-//     {id: 'density', label: 'Density', minWidth: 170, align: 'right', format: (value: number) => value.toFixed(2),},
-// ];
-
+import Selector from "./component/Selector.tsx";
 
 // TODO: While in Loading ,cartItem Skeleton
 export default function ShoppingCart() {
     const navigate = useNavigate()
-
-    // const [page, setPage] = React.useState(0);
-    // const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
     const [cartItem, setCartItem] = useState<CartItemListDto[] | []>([]);
     const [total, setTotal] = useState<number>(0);
-
     const loginUser = useContext(LoginUserContext);
 
+    // ----- For table use -----
     interface ExtendedCartItemListDto extends CartItemListDto {
         subtotal: number;
         cancel?: string;
@@ -50,43 +31,42 @@ export default function ShoppingCart() {
         id: 'image_url' | 'name' | 'price' | 'cart_quantity' | 'subtotal' | 'cancel';
         label: string;
         minWidth?: number;
-        align?: 'center' | 'right';
+        align?: 'center';
         format?: (value: number) => string;
     }
 
     const columns: readonly Column[] = [
-        {id: 'image_url', label: 'Product', minWidth: 100},
-        {id: 'name', label: 'Name', minWidth: 150},
+        {id: 'image_url', label: 'Product', minWidth: 150},
+        {id: 'name', label: 'Name', minWidth: 300},
         {
             id: 'price',
             label: 'Unit Price',
-            minWidth: 170,
+            minWidth: 100,
             align: 'center',
             format: (value: number) => `$ ${value.toFixed(2)}`
         },
-        {id: 'cart_quantity', label: 'Quantity', minWidth: 100, align: 'center'},
+        {
+            id: 'cart_quantity',
+            label: 'Quantity',
+            minWidth: 200,
+            align: 'center'
+        },
         {
             id: 'subtotal',
             label: 'Subtotal',
             minWidth: 100,
-            align: 'right',
+            align: 'center',
             format: (value: number) => `$ ${value.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             })}`
         },
-        {id: 'cancel', label: '', minWidth: 100, align: 'center'}
+        {id: 'cancel', label: '', minWidth: 80, align: 'center'}
     ]
-
-    // const handleChangePage = (_event: unknown, newPage: number) => {
-    //     setPage(newPage);
-    // };
-    //
-    // const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setRowsPerPage(+event.target.value);
-    //     setPage(0);
-    // };
-
+    const rows: ExtendedCartItemListDto[] = cartItem.map(item => ({
+        ...item,
+        subtotal: item.price * item.cart_quantity
+    }));
 
     const getCartItem = async () => {
         try {
@@ -102,29 +82,63 @@ export default function ShoppingCart() {
             navigate("/error");
         }
     }
+    const handleDeleteCarItem = async (deletePid: number) => {
+        try {
+            await CartItemApi.deleteCartItem(deletePid)
+                .then(() => {
+                    setCartItem(prevCartItems => prevCartItems.filter(
+                        item => item.pid !== deletePid)
+                    );
+                });
 
-    const rows: ExtendedCartItemListDto[] = cartItem.map(item => ({
-        ...item,
-        subtotal: item.price * item.cart_quantity
-    }));
+            const newTotal = cartItem.reduce((accumulator, item) => {
+                if (item.pid !== deletePid) {
+                    return accumulator + item.price * item.cart_quantity;
+                }
+                return accumulator;
+            }, 0);
 
-    const handleDeleteCarItem = (deletePid: number) => {
-        CartItemApi.deleteCartItem(deletePid)
-            .then(() => {
-                setCartItem(prevCartItems => prevCartItems.filter(
-                    item => item.pid !== deletePid)
-                );
-            });
-
-        const newTotal = cartItem.reduce((accumulator, item) => {
-            if (item.pid !== deletePid) {
-                return accumulator + item.price * item.cart_quantity;
-            }
-            return accumulator;
-        }, 0);
-
-        setTotal(newTotal);
+            setTotal(newTotal);
+        } catch (error) {
+            navigate("/error");
+        }
     }
+
+    // need async await ??? so slow
+    const handleUpdateQuantity = async (pid: number, updatedQuantity: number) => {
+        try {
+            if (updatedQuantity < 1) {
+                updatedQuantity = 1;
+            }
+
+            const stockQuantityPromise = await ProductApi.getProductDetail(String(pid));
+            const stockQuantity = stockQuantityPromise.stock;
+
+            if (updatedQuantity > stockQuantity) {
+                updatedQuantity = stockQuantity;
+            }
+
+            const updatedCartItem = cartItem.map((item) => {
+                if (item.pid === pid) {
+                    CartItemApi.patchCartItem(pid, updatedQuantity);
+                    return {
+                        ...item,
+                        cart_quantity: updatedQuantity,
+                        subtotal: item.price * updatedQuantity,
+                    };
+                }
+                return item;
+            });
+            setCartItem(updatedCartItem);
+
+            const newTotal = updatedCartItem.reduce((accumulator, item) => {
+                return accumulator + item.price * item.cart_quantity;
+            }, 0);
+            setTotal(newTotal);
+        } catch (error) {
+            navigate('/error');
+        }
+    };
 
     useEffect(() => {
         if (loginUser) {
@@ -132,21 +146,17 @@ export default function ShoppingCart() {
         } else if (loginUser === null) {
             navigate("/login")
         }
-
     }, [loginUser])
 
     return (
-        <div style={{backgroundColor: "grey", height: "100vh", overflow: "auto"}}>
+        <div style={{backgroundColor: "whitesmoke", height: "100vh", overflow: "auto"}}>
             <TopNavBar/>
-
             <Container sx={{py: 5, overflow: "auto"}} maxWidth="xl">
                 <h1>Shopping Cart</h1>
                 <br/>
-
                 <Paper sx={{width: '100%', overflow: 'hidden'}}>
-                    <TableContainer sx={{maxHeight: 540}}>
+                    <TableContainer sx={{maxHeight: 540, backgroundColor: "transparent"}}>
                         <Table stickyHeader aria-label="sticky table">
-
                             <TableHead>
                                 <TableRow>
                                     {columns.map((column) => (
@@ -160,42 +170,45 @@ export default function ShoppingCart() {
                                     ))}
                                 </TableRow>
                             </TableHead>
-
                             <TableBody>
-                                {rows
-                                    // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row) => {
-                                        return (
-                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.pid}>
-                                                {columns.map((column) => {
-                                                    const value = row[column.id];
-                                                    if (column.id === "image_url") {
-                                                        return (
-                                                            <TableCell key={column.id} align={column.align}>
-                                                                <Avatar
-                                                                    src={String(value)}
-                                                                    alt="Product Image"
-                                                                    sx={{
-                                                                        width: 124,
-                                                                        height: 124,
-                                                                        borderRadius: '8px'
-                                                                    }}
-                                                                />
-                                                            </TableCell>
-                                                        );
-                                                    } else if (column.id === "cancel") {
-                                                        return (
-                                                            <TableCell
-                                                                key={column.id}
-                                                                align={column.align}
-                                                                onClick={() => handleDeleteCarItem(row.pid)}
-                                                            >
-                                                                <IconButton>
-                                                                    <DeleteIcon/>
-                                                                </IconButton>
-                                                            </TableCell>
-                                                        );
-                                                    }
+                                {rows.map((row) => {
+                                    return (
+                                        <TableRow key={row.pid} hover role="checkbox">
+                                            {columns.map((column) => {
+                                                const value = row[column.id];
+                                                if (column.id === "image_url") {
+                                                    return (
+                                                        <TableCell key={column.id} align={column.align}>
+                                                            <Avatar
+                                                                src={String(value)}
+                                                                alt="Product Image"
+                                                                sx={{
+                                                                    width: 124,
+                                                                    height: 124,
+                                                                    borderRadius: '8px'
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                    );
+                                                } else if (column.id === "cancel") {
+                                                    return (
+                                                        <TableCell key={column.id} align={column.align}
+                                                                   onClick={() => handleDeleteCarItem(row.pid)}>
+                                                            <IconButton>
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        </TableCell>
+                                                    );
+                                                } else if (column.id === "cart_quantity") {
+                                                    return (
+                                                        <TableCell key={column.id} align={column.align}>
+                                                            <Selector
+                                                                quantity={Number(value)}
+                                                                handleOnChange={(updatedQuantity) => handleUpdateQuantity(row.pid, updatedQuantity)}
+                                                            />
+                                                        </TableCell>
+                                                    );
+                                                } else {
                                                     return (
                                                         <TableCell key={column.id} align={column.align}>
                                                             {column.format && typeof value === "number"
@@ -203,38 +216,55 @@ export default function ShoppingCart() {
                                                                 : value}
                                                         </TableCell>
                                                     );
-                                                })}
-                                            </TableRow>
-                                        );
-                                    })
-                                }
-
-                                <TableRow>
-                                    <TableCell colSpan={3} sx={{borderBottom: 'none'}}/>
-                                    <TableCell colSpan={1} align="center" sx={{height: 72, borderBottom: 'none'}}>
-                                        Total
-                                    </TableCell>
-                                    <TableCell align="right" sx={{borderBottom: 'none'}}>
-                                        {`$ ${total.toLocaleString('en-US', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        })}`}
-                                    </TableCell>
-                                </TableRow>
+                                                }
+                                            })}
+                                        </TableRow>
+                                    );
+                                })}
 
                             </TableBody>
                         </Table>
                     </TableContainer>
 
-                    {/*<TablePagination*/}
-                    {/*    rowsPerPageOptions={[10, 25, 100]}*/}
-                    {/*    component="div"*/}
-                    {/*    count={rows.length}*/}
-                    {/*    // rowsPerPage={rowsPerPage}*/}
-                    {/*    // page={page}*/}
-                    {/*    onPageChange={handleChangePage}*/}
-                    {/*    onRowsPerPageChange={handleChangeRowsPerPage}*/}
-                    {/*/>*/}
+                    <TableContainer
+                        sx={{
+                            backgroundColor: "transparent",
+                            overflowY: rows.length > 3 ? "scroll" : "auto",
+                            "&::-webkit-scrollbar": {
+                                backgroundColor: "transparent",
+                            },
+                            "&::-webkit-scrollbar-thumb": {
+                                backgroundColor: "transparent",
+                            },
+                            "&::-webkit-scrollbar-thumb:hover": {
+                                backgroundColor: "rgba(0, 0, 0, 0.2)",
+                            },
+                        }}
+                    >
+                        <Table>
+                            <TableRow hover role="checkbox">
+                                {columns.map((column, index) => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{
+                                            minWidth: column.minWidth,
+                                            height: '124.5px',
+                                            fontWeight: 'bold',
+                                            fontSize: '16px',
+                                        }}
+                                    >
+                                        {index === 3 ? 'Total' : null}
+                                        {index === 4 ? `$ ${total.toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}` : null}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </Table>
+                    </TableContainer>
+
 
                 </Paper>
             </Container>
