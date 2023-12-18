@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {
     Avatar, Paper,
-    Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from "@mui/material";
 import TopNavBar from "../../component/TopNavBar.tsx";
 import Container from "@mui/material/Container";
@@ -10,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import {CartItemListDto} from "../../../data/dto/CartItemDto.ts";
 import * as CartItemApi from "../../../api/CartItemApi.ts"
 import {useNavigate} from "react-router-dom";
+import {LoginUserContext} from "../../../App.tsx";
 
 // MUI table example
 // interface Column {
@@ -27,13 +28,18 @@ import {useNavigate} from "react-router-dom";
 //     {id: 'density', label: 'Density', minWidth: 170, align: 'right', format: (value: number) => value.toFixed(2),},
 // ];
 
+
+// TODO: While in Loading ,cartItem Skeleton
 export default function ShoppingCart() {
     const navigate = useNavigate()
 
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    // const [page, setPage] = React.useState(0);
+    // const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
     const [cartItem, setCartItem] = useState<CartItemListDto[] | []>([]);
     const [total, setTotal] = useState<number>(0);
+
+    const loginUser = useContext(LoginUserContext);
 
     interface ExtendedCartItemListDto extends CartItemListDto {
         subtotal: number;
@@ -72,18 +78,19 @@ export default function ShoppingCart() {
         {id: 'cancel', label: '', minWidth: 100, align: 'center'}
     ]
 
-    const handleChangePage = (_event: unknown, newPage: number) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
+    // const handleChangePage = (_event: unknown, newPage: number) => {
+    //     setPage(newPage);
+    // };
+    //
+    // const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setRowsPerPage(+event.target.value);
+    //     setPage(0);
+    // };
 
 
     const getCartItem = async () => {
         try {
+            document.title = "Shopping Cart"
             const data = await CartItemApi.getCartItem();
             setCartItem(data);
 
@@ -91,8 +98,7 @@ export default function ShoppingCart() {
                 return accumulator + item.price * item.cart_quantity;
             }, 0);
             setTotal(total);
-
-        } catch (e) {
+        } catch (error) {
             navigate("/error");
         }
     }
@@ -109,11 +115,25 @@ export default function ShoppingCart() {
                     item => item.pid !== deletePid)
                 );
             });
+
+        const newTotal = cartItem.reduce((accumulator, item) => {
+            if (item.pid !== deletePid) {
+                return accumulator + item.price * item.cart_quantity;
+            }
+            return accumulator;
+        }, 0);
+
+        setTotal(newTotal);
     }
 
     useEffect(() => {
-        getCartItem();
-    }, [])
+        if (loginUser) {
+            getCartItem();
+        } else if (loginUser === null) {
+            navigate("/login")
+        }
+
+    }, [loginUser])
 
     return (
         <div style={{backgroundColor: "grey", height: "100vh", overflow: "auto"}}>
@@ -124,7 +144,7 @@ export default function ShoppingCart() {
                 <br/>
 
                 <Paper sx={{width: '100%', overflow: 'hidden'}}>
-                    <TableContainer sx={{maxHeight: 600}}>
+                    <TableContainer sx={{maxHeight: 540}}>
                         <Table stickyHeader aria-label="sticky table">
 
                             <TableHead>
@@ -143,7 +163,7 @@ export default function ShoppingCart() {
 
                             <TableBody>
                                 {rows
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => {
                                         return (
                                             <TableRow hover role="checkbox" tabIndex={-1} key={row.pid}>
@@ -203,19 +223,19 @@ export default function ShoppingCart() {
                                 </TableRow>
 
                             </TableBody>
-
                         </Table>
                     </TableContainer>
 
-                    <TablePagination
-                        rowsPerPageOptions={[10, 25, 100]}
-                        component="div"
-                        count={rows.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
+                    {/*<TablePagination*/}
+                    {/*    rowsPerPageOptions={[10, 25, 100]}*/}
+                    {/*    component="div"*/}
+                    {/*    count={rows.length}*/}
+                    {/*    // rowsPerPage={rowsPerPage}*/}
+                    {/*    // page={page}*/}
+                    {/*    onPageChange={handleChangePage}*/}
+                    {/*    onRowsPerPageChange={handleChangeRowsPerPage}*/}
+                    {/*/>*/}
+
                 </Paper>
             </Container>
         </div>

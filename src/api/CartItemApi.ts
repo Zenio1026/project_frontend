@@ -27,7 +27,7 @@ export async function getCartItem(): Promise<CartItemListDto[]> {
             throw new Error("Access token not available");
         }
         const config = {headers: {Authorization: `Bearer ${accessToken}`}};
-        const response = await axios.get(`${baseUrl}/cart`, config);
+        const response = await axios.get<CartItemListDto[]>(`${baseUrl}/cart`, config);
         return response.data;
     } catch (error) {
         console.error(error);
