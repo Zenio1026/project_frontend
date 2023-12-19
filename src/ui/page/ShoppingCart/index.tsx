@@ -82,33 +82,13 @@ export default function ShoppingCart() {
             navigate("/error");
         }
     }
-    const handleDeleteCarItem = async (deletePid: number) => {
-        try {
-            await CartItemApi.deleteCartItem(deletePid)
-                .then(() => {
-                    setCartItem(prevCartItems => prevCartItems.filter(
-                        item => item.pid !== deletePid)
-                    );
-                });
-
-            const newTotal = cartItem.reduce((accumulator, item) => {
-                if (item.pid !== deletePid) {
-                    return accumulator + item.price * item.cart_quantity;
-                }
-                return accumulator;
-            }, 0);
-
-            setTotal(newTotal);
-        } catch (error) {
-            navigate("/error");
-        }
-    }
 
     // need async await ??? so slow
     const handleUpdateQuantity = async (pid: number, updatedQuantity: number) => {
         try {
             if (updatedQuantity < 1) {
                 updatedQuantity = 1;
+                return null;
             }
 
             const stockQuantityPromise = await ProductApi.getProductDetail(String(pid));
@@ -117,7 +97,6 @@ export default function ShoppingCart() {
             if (updatedQuantity > stockQuantity) {
                 updatedQuantity = stockQuantity;
             }
-
             const updatedCartItem = cartItem.map((item) => {
                 if (item.pid === pid) {
                     CartItemApi.patchCartItem(pid, updatedQuantity);
@@ -139,6 +118,29 @@ export default function ShoppingCart() {
             navigate('/error');
         }
     };
+
+    // api can be reduced but need to depend on situation.
+    const handleDeleteCarItem = async (deletePid: number) => {
+        try {
+            await CartItemApi.deleteCartItem(deletePid)
+                .then(() => {
+                    setCartItem(prevCartItems => prevCartItems.filter(
+                        item => item.pid !== deletePid)
+                    );
+                });
+
+            const newTotal = cartItem.reduce((accumulator, item) => {
+                if (item.pid !== deletePid) {
+                    return accumulator + item.price * item.cart_quantity;
+                }
+                return accumulator;
+            }, 0);
+
+            setTotal(newTotal);
+        } catch (error) {
+            navigate("/error");
+        }
+    }
 
     useEffect(() => {
         if (loginUser) {
@@ -190,15 +192,6 @@ export default function ShoppingCart() {
                                                             />
                                                         </TableCell>
                                                     );
-                                                } else if (column.id === "cancel") {
-                                                    return (
-                                                        <TableCell key={column.id} align={column.align}
-                                                                   onClick={() => handleDeleteCarItem(row.pid)}>
-                                                            <IconButton>
-                                                                <DeleteIcon/>
-                                                            </IconButton>
-                                                        </TableCell>
-                                                    );
                                                 } else if (column.id === "cart_quantity") {
                                                     return (
                                                         <TableCell key={column.id} align={column.align}>
@@ -206,6 +199,18 @@ export default function ShoppingCart() {
                                                                 quantity={Number(value)}
                                                                 handleOnChange={(updatedQuantity) => handleUpdateQuantity(row.pid, updatedQuantity)}
                                                             />
+                                                        </TableCell>
+                                                    );
+                                                } else if (column.id === "cancel") {
+                                                    return (
+                                                        <TableCell
+                                                            key={column.id}
+                                                            align={column.align}
+                                                            onClick={() => handleDeleteCarItem(row.pid)}
+                                                        >
+                                                            <IconButton>
+                                                                <DeleteIcon/>
+                                                            </IconButton>
                                                         </TableCell>
                                                     );
                                                 } else {
@@ -264,7 +269,6 @@ export default function ShoppingCart() {
                             </TableRow>
                         </Table>
                     </TableContainer>
-
 
                 </Paper>
             </Container>
