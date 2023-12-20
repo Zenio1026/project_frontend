@@ -6,8 +6,9 @@ import ProductDetail from './ui/page/ProductDetail';
 import LoginPage from "./ui/page/LoginPage";
 import ShoppingCart from "./ui/page/ShoppingCart";
 import {createContext, useEffect, useState} from "react";
-import * as FirebaseAuthService from ".//authService/FirebaseAuthService.ts"
 import {UserData} from "./data/dto/UserDto.ts";
+import * as FirebaseAuthService from ".//authService/FirebaseAuthService.ts"
+import Checkout from './ui/page/Checkout/index.tsx';
 
 export const LoginUserContext = createContext<UserData | null | undefined>(undefined);
 
@@ -36,10 +37,10 @@ function App() {
             path: "/login",
             element: <LoginPage/>
         },
-        // {
-        //   path: "/checkout/:transactionId",
-        //   element: <Checkout/>
-        // },
+        {
+          path: "/checkout",
+          element: <Checkout/>
+        },
         // {
         //   path: "/thankyou",
         //   element: <ThankYou/>
@@ -60,3 +61,8 @@ function App() {
 }
 
 export default App
+
+// {
+//     path: "/checkout/:transactionId",
+//         element: <Checkout/>
+// },

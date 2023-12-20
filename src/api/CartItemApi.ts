@@ -4,15 +4,22 @@ import {CartItemListDto} from "../data/dto/CartItemDto.ts";
 
 const baseUrl = "http://localhost:8080"
 
+const getAuthConfig = async () => {
+    const accessToken = await FirebaseAuthService.getAccessToken();
+    if (!accessToken) {
+        throw new Error("Access token not available");
+    }
+    return {headers: {Authorization: `Bearer ${accessToken}`}};
+}
+
 // Add CartItem
 export async function putCartItem(pid: string, quantity: number) {
     try {
-        const accessToken = await FirebaseAuthService.getAccessToken();
-        if (!accessToken) {
-            throw new Error("Access token not available");
-        }
-        const config = {headers: {Authorization: `Bearer ${accessToken}`}};
-        await axios.put(`${baseUrl}/cart/${pid}/${quantity}`, null, config);
+        await axios.put(
+            `${baseUrl}/cart/${pid}/${quantity}`,
+            null,
+            await getAuthConfig()
+        );
     } catch (error) {
         console.error(error);
         throw error;
@@ -22,12 +29,10 @@ export async function putCartItem(pid: string, quantity: number) {
 // Get CartItem
 export async function getCartItem(): Promise<CartItemListDto[]> {
     try {
-        const accessToken = await FirebaseAuthService.getAccessToken();
-        if (!accessToken) {
-            throw new Error("Access token not available");
-        }
-        const config = {headers: {Authorization: `Bearer ${accessToken}`}};
-        const response = await axios.get<CartItemListDto[]>(`${baseUrl}/cart`, config);
+        const response = await axios.get<CartItemListDto[]>(
+            `${baseUrl}/cart`,
+            await getAuthConfig()
+        );
         return response.data;
     } catch (error) {
         console.error(error);
@@ -38,12 +43,11 @@ export async function getCartItem(): Promise<CartItemListDto[]> {
 // Update CartItem
 export async function patchCartItem(pid: number, quantity: number) {
     try {
-        const accessToken = await FirebaseAuthService.getAccessToken();
-        if (!accessToken) {
-            throw new Error("Access token not available");
-        }
-        const config = {headers: {Authorization: `Bearer ${accessToken}`}};
-        await axios.patch(`${baseUrl}/cart/${pid}/${quantity}`, null, config);
+        await axios.patch(
+            `${baseUrl}/cart/${pid}/${quantity}`,
+            null,
+            await getAuthConfig()
+        );
     } catch (error) {
         console.error(error);
         throw error;
@@ -53,12 +57,10 @@ export async function patchCartItem(pid: number, quantity: number) {
 // Delete CartItem
 export async function deleteCartItem(pid: number) {
     try {
-        const accessToken = await FirebaseAuthService.getAccessToken();
-        if (!accessToken) {
-            throw new Error("Access token not available");
-        }
-        const config = {headers: {Authorization: `Bearer ${accessToken}`}};
-        await axios.delete(`${baseUrl}/cart/${pid}`, config)
+        await axios.delete(
+            `${baseUrl}/cart/${pid}`,
+            await getAuthConfig()
+        );
     } catch (error) {
         console.error(error);
         throw error;

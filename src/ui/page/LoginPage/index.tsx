@@ -1,5 +1,5 @@
 import Container from "@mui/material/Container";
-import {TextField} from "@mui/material";
+import {styled, TextField} from "@mui/material";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Avatar from "@mui/material/Avatar";
@@ -12,6 +12,23 @@ import {useNavigate} from "react-router-dom";
 import {GoogleLoginButton} from "react-social-login-buttons";
 import {LoginUserContext} from "../../../App.tsx";
 import * as React from "react";
+
+const WhiteBorderTextField = styled(TextField)`
+    & label.Mui-focused {
+        color: rgba(255, 250, 250, 0.26);
+    }
+    & .MuiOutlinedInput-root {
+        &.Mui-focused fieldset {
+            border-color: rgba(255, 250, 250, 0.26);
+        }
+        & fieldset {
+            border-color: rgba(255, 250, 250, 0.26);
+        }
+        &:hover fieldset {
+            border-color: rgba(255, 250, 250, 0.26);
+        }
+    }
+`;
 
 export default function LoginPage() {
     const [email, setEmail] = useState<string>("");
@@ -59,11 +76,11 @@ export default function LoginPage() {
                         alignItems: 'center',
                     }}
                 >
-                    <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+                    <Avatar sx={{m: 1, backgroundColor: 'rgb(0,112,209)'}}>
                         <LockOutlinedIcon/>
                     </Avatar>
 
-                    <Typography component="h1" variant="h5">
+                    <Typography component="h1" variant="h5" sx={{color: 'snow'}}>
                         Sign in
                     </Typography>
 
@@ -74,7 +91,7 @@ export default function LoginPage() {
                     >
 
                         {/*----- Email Address -----*/}
-                        <TextField
+                        <WhiteBorderTextField
                             margin="normal"
                             required
                             fullWidth
@@ -86,10 +103,16 @@ export default function LoginPage() {
                             autoFocus
                             onChange={handleEmailChange}
                             value={email}
+                            InputProps={{
+                                style: { color: 'snow' },
+                            }}
+                            InputLabelProps={{
+                                style: { color: 'snow' },
+                            }}
                         />
 
                         {/*----- Password -----*/}
-                        <TextField
+                        <WhiteBorderTextField
                             margin="normal"
                             required
                             fullWidth
@@ -100,6 +123,12 @@ export default function LoginPage() {
                             autoComplete="current-password"
                             onChange={handlePasswordChange}
                             value={password}
+                            InputProps={{
+                                style: { color: 'snow' },
+                            }}
+                            InputLabelProps={{
+                                style: { color: 'snow' },
+                            }}
                         />
 
                         {/*----- Sign In Button -----*/}
@@ -107,7 +136,7 @@ export default function LoginPage() {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{mt: 3, mb: 2}}
+                            sx={{mt: 3, mb: 2, backgroundColor: "rgb(0,112,209)"}}
                         >
                             Sign In
                         </Button>

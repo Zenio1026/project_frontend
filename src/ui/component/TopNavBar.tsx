@@ -1,26 +1,28 @@
-import * as React from 'react';
+import React, {useContext, useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+
+import {alpha, Badge, BadgeProps, Divider, InputBase, ListItemIcon, styled} from "@mui/material";
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
+import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import Login from '@mui/icons-material/Login';
 import Logout from '@mui/icons-material/Logout';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import {alpha, Divider, InputBase, ListItemIcon, styled} from "@mui/material";
+import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import {useNavigate} from "react-router-dom";
-import {useContext} from "react";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+
 import {LoginUserContext} from "../../App.tsx";
+import * as CartItemApi from "../../api/CartItemApi.ts"
 import * as FirebaseAuthService from "../../authService/FirebaseAuthService.ts"
 
 const paperStyles = {
@@ -42,12 +44,20 @@ const paperStyles = {
     },
 };
 
+const StyledBadge = styled(Badge)<BadgeProps>(({theme}) => ({
+    '& .MuiBadge-badge': {
+        border: `2px solid ${theme.palette.background.paper}`,
+        padding: '0 4px',
+    },
+}));
+
 export default function TopNavBar() {
     const navigate = useNavigate();
     const loginUser = useContext(LoginUserContext);
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [cartItemLength, setCartItemLength] = useState<number>(0);
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -120,6 +130,21 @@ export default function TopNavBar() {
     const handleShoppingCartClick = () => {
         navigate("/shoppingcart")
     }
+
+    const getCartItemListLength = async () => {
+        try {
+            const data = await  CartItemApi.getCartItem();
+            setCartItemLength(data.length);
+        } catch (error) {
+            navigate("/error")
+        }
+    }
+
+    useEffect(() => {
+        if (loginUser) {
+            getCartItemListLength();
+        }
+    }, [loginUser])
 
     return (
         <AppBar position='sticky' sx={{backgroundColor: 'black'}}>
@@ -256,7 +281,7 @@ export default function TopNavBar() {
                         >
                             {loginUser ? (
                                 [
-                                    <MenuItem key="avatar">
+                                    <MenuItem key="avatar" disabled style={{pointerEvents: 'none', opacity: 1}}>
                                         <ListItemIcon>
                                             <AccountCircleIcon style={{color: 'grey', width: 24, height: 24}}/>
                                         </ListItemIcon>
@@ -267,7 +292,9 @@ export default function TopNavBar() {
 
                                     <MenuItem key="cart" onClick={handleShoppingCartClick}>
                                         <ListItemIcon>
-                                            <ShoppingCartIcon fontSize="small"/>
+                                            <StyledBadge badgeContent={cartItemLength} color="primary">
+                                                <ShoppingCartIcon fontSize="small"/>
+                                            </StyledBadge>
                                         </ListItemIcon>
                                         <Typography textAlign="center">Shopping Cart</Typography>
                                     </MenuItem>,
