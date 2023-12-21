@@ -1,7 +1,18 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 
-import {alpha, Badge, BadgeProps, Divider, InputBase, ListItemIcon, styled} from "@mui/material";
+import {
+    alpha,
+    Badge,
+    BadgeProps,
+    Dialog,
+    DialogActions,
+    DialogTitle,
+    Divider,
+    InputBase,
+    ListItemIcon,
+    styled
+} from "@mui/material";
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -58,6 +69,16 @@ export default function TopNavBar() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const [cartItemLength, setCartItemLength] = useState<number>(0);
+
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -133,7 +154,7 @@ export default function TopNavBar() {
 
     const getCartItemListLength = async () => {
         try {
-            const data = await  CartItemApi.getCartItem();
+            const data = await CartItemApi.getCartItem();
             setCartItemLength(data.length);
         } catch (error) {
             navigate("/error")
@@ -299,12 +320,39 @@ export default function TopNavBar() {
                                         <Typography textAlign="center">Shopping Cart</Typography>
                                     </MenuItem>,
 
-                                    <MenuItem key="sign-out" onClick={handleLogoutClick}>
-                                        <ListItemIcon>
-                                            <Logout fontSize="small"/>
-                                        </ListItemIcon>
-                                        <Typography textAlign="center">Sign Out</Typography>
-                                    </MenuItem>
+                                    <React.Fragment>
+
+                                        <MenuItem key="sign-out" onClick={handleClickOpen}>
+                                            <ListItemIcon>
+                                                <Logout fontSize="small"/>
+                                            </ListItemIcon>
+                                            <Typography textAlign="center">Sign Out</Typography>
+                                        </MenuItem>
+
+
+                                        <Dialog
+                                            open={open}
+                                            onClose={handleClose}
+                                            aria-labelledby="alert-dialog-title"
+                                            aria-describedby="alert-dialog-description"
+                                        >
+
+                                            <DialogTitle id="alert-dialog-title">
+                                                {"Are you sure to sign out?"}
+                                            </DialogTitle>
+
+
+                                            <DialogActions>
+                                                <Button onClick={handleClose}>Cancel</Button>
+                                                <Button onClick={handleLogoutClick} autoFocus>
+                                                    Sure
+                                                </Button>
+                                            </DialogActions>
+
+
+
+                                        </Dialog>
+                                    </React.Fragment>
                                 ]
                             ) : (
                                 <MenuItem key="sign-in" onClick={handleLoginClick}>

@@ -60,10 +60,13 @@ export default function Checkout() {
             <TopNavBar/>
 
             <Container component="main" maxWidth="sm" sx={{mb: 4}}>
+
                 <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
+
                     <Typography component="h1" variant="h4" align="center">
                         Checkout
                     </Typography>
+
                     <Stepper activeStep={activeStep} sx={{pt: 3, pb: 5}}>
                         {steps.map((label) => (
                             <Step key={label}>
@@ -71,6 +74,7 @@ export default function Checkout() {
                             </Step>
                         ))}
                     </Stepper>
+
                     {activeStep === steps.length ? (
                         <React.Fragment>
                             <Typography variant="h5" gutterBottom>
@@ -102,6 +106,7 @@ export default function Checkout() {
                         </React.Fragment>
                     )}
                 </Paper>
+
                 <Copyright/>
             </Container>
         </React.Fragment>
