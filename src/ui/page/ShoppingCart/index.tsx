@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 
 import {
     Avatar,
-    Button,
+    Button, CircularProgress,
     Paper,
     Table,
     TableBody,
@@ -28,6 +28,7 @@ import TopNavBar from "../../component/TopNavBar.tsx";
 import {CartItemListDto} from "../../../data/dto/CartItemDto.ts";
 import * as CartItemApi from "../../../api/CartItemApi.ts"
 import * as ProductApi from "../../../api/ProductApi.ts"
+import * as TransactionApi from "../../../api/TransactionApi.ts"
 
 export default function ShoppingCart() {
     const loginUser = useContext(LoginUserContext);
@@ -41,6 +42,8 @@ export default function ShoppingCart() {
 
     const [isDeletingItem, setIsDeletingItem] = useState<boolean>(false);
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+
+    const [isCheckout, setIsCheckOut] = useState<boolean>(false);
 
     interface ExtendedCartItemListDto extends CartItemListDto {
         subtotal: number;
@@ -145,7 +148,6 @@ export default function ShoppingCart() {
         }
     };
 
-    // api can be reduced but need to depend on situation.
     const handleDeleteCarItem = async (deletePid: number) => {
         try {
             setIsDeletingItem(true);
@@ -168,6 +170,17 @@ export default function ShoppingCart() {
             setIsDeletingItem(false);
         } catch (error) {
             navigate("/error");
+        }
+    }
+
+    const handleCheckout = async () => {
+        try {
+            setIsCheckOut(true);
+            const transactionData = await TransactionApi.prepareTransaction();
+            navigate(`/checkout/${transactionData.tid}`);
+            setIsCheckOut(false);
+        } catch (error) {
+            navigate("/error")
         }
     }
 
@@ -202,170 +215,195 @@ export default function ShoppingCart() {
                 </h1>
                 <br/>
 
-                {
-                    cartItem ? (
-                        cartItem.length > 0 ? (
-                            <Paper sx={{width: '100%', overflow: 'hidden'}}>
-                                <TableContainer sx={{maxHeight: 540}}>
-                                    <Table stickyHeader aria-label="sticky table">
-                                        <TableHead>
-                                            <TableRow>
-                                                {columns.map((column) => (
-                                                    <TableCell
-                                                        key={column.id}
-                                                        align={column.align}
-                                                        style={{minWidth: column.minWidth}}
-                                                    >
-                                                        {column.label}
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {rows && rows.map((row) => {
-                                                return (
-                                                    <TableRow key={row.pid} hover role="checkbox">
-                                                        {columns.map((column) => {
-                                                            const value = row[column.id];
-                                                            if (column.id === "image_url") {
-                                                                return (
-                                                                    <TableCell key={column.id}
-                                                                               align={column.align}>
-                                                                        <Avatar
-                                                                            src={String(value)}
-                                                                            alt="Product Image"
-                                                                            sx={{
-                                                                                width: 124,
-                                                                                height: 124,
-                                                                                borderRadius: '8px'
-                                                                            }}
-                                                                        />
-                                                                    </TableCell>
-                                                                );
-                                                            } else if (column.id === "cart_quantity") {
-                                                                return (
-                                                                    <TableCell key={column.id}
-                                                                               align={column.align}>
-                                                                        {
-                                                                            isPatchingQuantity && patchingItemId === row.pid ? (
-                                                                                <SelectorSkeleton/>
-                                                                            ) : (
-                                                                                <Selector
-                                                                                    quantity={Number(value)}
-                                                                                    handleOnChange={(updatedQuantity) => handleUpdateQuantity(row.pid, updatedQuantity)}
-                                                                                />
-                                                                            )
-                                                                        }
-                                                                    </TableCell>
-                                                                );
-                                                            } else if (column.id === "cancel") {
-                                                                return (
-                                                                    <TableCell
-                                                                        key={column.id}
-                                                                        align={column.align}
-                                                                        onClick={() => handleDeleteCarItem(row.pid)}
-                                                                    >
-                                                                        {
-                                                                            isDeletingItem && deletingItemId === row.pid ? (
-                                                                                <DeleteItemSkeleton/>
-                                                                            ) : (
-                                                                                <IconButton>
-                                                                                    <DeleteIcon/>
-                                                                                </IconButton>
-                                                                            )
-                                                                        }
-                                                                    </TableCell>
-                                                                );
-                                                            } else {
-                                                                return (
-                                                                    <TableCell key={column.id}
-                                                                               align={column.align}>
-                                                                        {column.format && typeof value === "number"
-                                                                            ? column.format(value)
-                                                                            : value}
-                                                                    </TableCell>
-                                                                );
-                                                            }
-                                                        })}
-                                                    </TableRow>
-                                                );
-                                            })}
-
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-
-                                <TableContainer sx={{
-                                    overflowY: rows && rows.length > 3 ? "scroll" : "auto",
-                                    "&::-webkit-scrollbar": {
-                                        backgroundColor: "transparent",
-                                    },
-                                    "&::-webkit-scrollbar-thumb": {
-                                        backgroundColor: "transparent",
-                                    },
-                                    "&::-webkit-scrollbar-thumb:hover": {
-                                        backgroundColor: "rgba(0, 0, 0, 0.2)",
-                                    },
-                                }}>
-                                    <Table>
-                                        <TableBody>
-                                            <TableRow hover role="checkbox">
-                                                {columns.map((column, index) => (
-                                                    <TableCell
-                                                        key={column.id}
-                                                        align={column.align}
-                                                        style={{
-                                                            minWidth: column.minWidth,
-                                                            height: '124.5px',
-                                                            fontWeight: 'bold',
-                                                            fontSize: '16px',
-                                                        }}
-                                                    >
-                                                        {index === 1 ? (
-                                                            <Button
-                                                                type="submit"
-                                                                variant="contained"
-                                                                style={{ marginLeft: '-150px' }}
-                                                                sx={{
-                                                                    width: "300px",
-                                                                    borderRadius: "24px",
-                                                                    fontSize: "16px",
-                                                                    fontWeight: "bold",
-                                                                    backgroundColor: "rgb(214, 61, 0)",
-                                                                    "&:hover": {
-                                                                        backgroundColor: "rgb(163, 46, 0)",
-                                                                    },
-                                                                    "&:active": {
-                                                                        backgroundColor: "rgb(112, 32, 0)",
-                                                                    },
-                                                                }}
-                                                                startIcon={<ShoppingCartCheckoutIcon
-                                                                    style={{fontSize: "24px"}}/>}
-                                                            >
-                                                                Check Out
-                                                            </Button>
-                                                        ) : null}
-
-                                                        {index === 3 ? 'Total' : null}
-                                                        {index === 4 ? `$ ${total && total.toLocaleString('en-US', {
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2
-                                                        })}` : null}
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-
-                            </Paper>
-                        ) : (
-                            <EmptyCart/>
-                        )
+                {cartItem ? (
+                    cartItem.length > 0 ? (
+                        <Paper sx={{width: '100%', overflow: 'hidden'}}>
+                            {/*table 1*/}
+                            <TableContainer sx={{maxHeight: 540}}>
+                                <Table stickyHeader aria-label="sticky table">
+                                    <TableHead>
+                                        <TableRow>
+                                            {columns.map((column) => (
+                                                <TableCell
+                                                    key={column.id}
+                                                    align={column.align}
+                                                    style={{minWidth: column.minWidth}}
+                                                >
+                                                    {column.label}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {rows && rows.map((row) => {
+                                            return (
+                                                <TableRow key={row.pid} hover role="checkbox">
+                                                    {columns.map((column) => {
+                                                        const value = row[column.id];
+                                                        if (column.id === "image_url") {
+                                                            return (
+                                                                <TableCell key={column.id}
+                                                                           align={column.align}>
+                                                                    <Avatar
+                                                                        src={String(value)}
+                                                                        alt="Product Image"
+                                                                        sx={{
+                                                                            width: 124,
+                                                                            height: 124,
+                                                                            borderRadius: '8px'
+                                                                        }}
+                                                                    />
+                                                                </TableCell>
+                                                            );
+                                                        } else if (column.id === "cart_quantity") {
+                                                            return (
+                                                                <TableCell key={column.id}
+                                                                           align={column.align}>
+                                                                    {
+                                                                        isPatchingQuantity && patchingItemId === row.pid ? (
+                                                                            <SelectorSkeleton/>
+                                                                        ) : (
+                                                                            <Selector
+                                                                                quantity={Number(value)}
+                                                                                handleOnChange={(updatedQuantity) => handleUpdateQuantity(row.pid, updatedQuantity)}
+                                                                            />
+                                                                        )
+                                                                    }
+                                                                </TableCell>
+                                                            );
+                                                        } else if (column.id === "cancel") {
+                                                            return (
+                                                                <TableCell
+                                                                    key={column.id}
+                                                                    align={column.align}
+                                                                >
+                                                                    {
+                                                                        isDeletingItem && deletingItemId === row.pid ? (
+                                                                            <DeleteItemSkeleton/>
+                                                                        ) : (
+                                                                            <IconButton
+                                                                                onClick={() => handleDeleteCarItem(row.pid)}>
+                                                                                <DeleteIcon/>
+                                                                            </IconButton>
+                                                                        )
+                                                                    }
+                                                                </TableCell>
+                                                            );
+                                                        } else {
+                                                            return (
+                                                                <TableCell key={column.id}
+                                                                           align={column.align}>
+                                                                    {column.format && typeof value === "number"
+                                                                        ? column.format(value)
+                                                                        : value}
+                                                                </TableCell>
+                                                            );
+                                                        }
+                                                    })}
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            {/*table 2*/}
+                            <TableContainer sx={{
+                                overflowY: rows && rows.length > 3 ? "scroll" : "auto",
+                                "&::-webkit-scrollbar": {
+                                    backgroundColor: "transparent",
+                                },
+                                "&::-webkit-scrollbar-thumb": {
+                                    backgroundColor: "transparent",
+                                },
+                                "&::-webkit-scrollbar-thumb:hover": {
+                                    backgroundColor: "rgba(0, 0, 0, 0.2)",
+                                },
+                            }}>
+                                <Table>
+                                    <TableBody>
+                                        <TableRow hover role="checkbox">
+                                            {columns.map((column, index) => (
+                                                <TableCell
+                                                    key={column.id}
+                                                    align={column.align}
+                                                    style={{
+                                                        minWidth: column.minWidth,
+                                                        height: '124.5px',
+                                                        fontWeight: 'bold',
+                                                        fontSize: '16px',
+                                                    }}
+                                                >
+                                                    {index === 1 ? (
+                                                        <>
+                                                            {isCheckout ? (
+                                                                <Button
+                                                                    disabled
+                                                                    type="submit"
+                                                                    variant="contained"
+                                                                    style={{marginLeft: "-150px"}}
+                                                                    sx={{
+                                                                        width: "300px",
+                                                                        borderRadius: "24px",
+                                                                        fontSize: "16px",
+                                                                        fontWeight: "bold",
+                                                                        backgroundColor: "rgb(214, 61, 0)",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "rgb(163, 46, 0)",
+                                                                        },
+                                                                        "&:active": {
+                                                                            backgroundColor: "rgb(112, 32, 0)",
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <CircularProgress
+                                                                        style={{color: 'rgb(112, 32, 0)'}}
+                                                                        size={28}/>
+                                                                </Button>
+                                                            ) : (
+                                                                <Button
+                                                                    type="submit"
+                                                                    variant="contained"
+                                                                    style={{marginLeft: "-150px"}}
+                                                                    sx={{
+                                                                        width: "300px",
+                                                                        borderRadius: "24px",
+                                                                        fontSize: "16px",
+                                                                        fontWeight: "bold",
+                                                                        backgroundColor: "rgb(214, 61, 0)",
+                                                                        "&:hover": {
+                                                                            backgroundColor: "rgb(163, 46, 0)",
+                                                                        },
+                                                                        "&:active": {
+                                                                            backgroundColor: "rgb(112, 32, 0)",
+                                                                        },
+                                                                    }}
+                                                                    startIcon={<ShoppingCartCheckoutIcon
+                                                                        style={{fontSize: "24px"}}/>}
+                                                                    onClick={handleCheckout}
+                                                                >
+                                                                    Check Out
+                                                                </Button>
+                                                            )}
+                                                        </>
+                                                    ) : null}
+                                                    {index === 3 ? 'Total' : null}
+                                                    {index === 4 ? `$ ${total && total.toLocaleString('en-US', {
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2
+                                                    })}` : null}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Paper>
                     ) : (
-                        <LoadingCart/>
+                        <EmptyCart/>
                     )
-                }
+                ) : (
+                    <LoadingCart/>
+                )}
             </Container>
         </div>
     );

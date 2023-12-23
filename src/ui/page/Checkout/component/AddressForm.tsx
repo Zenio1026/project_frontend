@@ -4,8 +4,65 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import {useState} from "react";
 
-export default function AddressForm() {
+type Props = {
+    setAddressFormValues: React.Dispatch<React.SetStateAction<{
+        firstName: string,
+        lastName: string,
+        address1: string,
+        address2: string,
+        city: string,
+        state: string,
+        zipCode: string,
+        country: string
+        }>>;
+}
+
+export default function AddressForm({setAddressFormValues}: Props) {
+    const [firstName, setFirstName] = useState<string>("");
+    const [lastName, setLastName] = useState<string>("");
+    const [address1, setAddress1] = useState<string>("");
+    const [address2, setAddress2] = useState<string>("");
+    const [city, setCity] = useState<string>("");
+    const [state, setState] = useState<string>("");
+    const [zipCode, setZipCode] = useState<string>("");
+    const [country, setCountry] = useState<string>("");
+
+    const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFirstName(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, firstName: event.target.value }));
+    }
+    const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLastName(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, lastName: event.target.value }));
+    }
+    const handleAddress1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAddress1(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, address1: event.target.value }));
+    }
+    const handleAddress2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAddress2(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, address2: event.target.value }));
+    }
+    const handleCityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCity(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, city: event.target.value }));
+    }
+    const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, state: event.target.value }));
+    }
+    const handleZipCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setZipCode(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, zipCode: event.target.value }));
+    }
+    const handleCountryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCountry(event.target.value);
+        setAddressFormValues((prevValues) => ({ ...prevValues, country: event.target.value }));
+    }
+
+
     return (
         <React.Fragment>
             <Typography variant="h6" gutterBottom>
@@ -21,6 +78,8 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="given-name"
                         variant="standard"
+                        value={firstName}
+                        onChange={handleFirstNameChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -32,6 +91,8 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="family-name"
                         variant="standard"
+                        value={lastName}
+                        onChange={handleLastNameChange}
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -43,6 +104,8 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="shipping address-line1"
                         variant="standard"
+                        value={address1}
+                        onChange={handleAddress1Change}
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -53,6 +116,8 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="shipping address-line2"
                         variant="standard"
+                        value={address2}
+                        onChange={handleAddress2Change}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -64,6 +129,8 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="shipping address-level2"
                         variant="standard"
+                        value={city}
+                        onChange={handleCityChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -73,6 +140,8 @@ export default function AddressForm() {
                         label="State/Province/Region"
                         fullWidth
                         variant="standard"
+                        value={state}
+                        onChange={handleStateChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -84,6 +153,8 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="shipping postal-code"
                         variant="standard"
+                        value={zipCode}
+                        onChange={handleZipCodeChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -95,11 +166,13 @@ export default function AddressForm() {
                         fullWidth
                         autoComplete="shipping country"
                         variant="standard"
+                        value={country}
+                        onChange={handleCountryChange}
                     />
                 </Grid>
                 <Grid item xs={12}>
                     <FormControlLabel
-                        control={<Checkbox color="secondary" name="saveAddress" value="yes" />}
+                        control={<Checkbox color="secondary" name="saveAddress" value="yes"/>}
                         label="Use this address for payment details"
                     />
                 </Grid>

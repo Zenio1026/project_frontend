@@ -36,6 +36,7 @@ import {LoginUserContext} from "../../App.tsx";
 import * as CartItemApi from "../../api/CartItemApi.ts"
 import * as FirebaseAuthService from "../../authService/FirebaseAuthService.ts"
 
+// Custom Mui Component Style
 const paperStyles = {
     elevation: 0,
     overflow: 'visible',
@@ -54,7 +55,6 @@ const paperStyles = {
         zIndex: 0,
     },
 };
-
 const StyledBadge = styled(Badge)<BadgeProps>(({theme}) => ({
     '& .MuiBadge-badge': {
         border: `2px solid ${theme.palette.background.paper}`,
@@ -65,37 +65,36 @@ const StyledBadge = styled(Badge)<BadgeProps>(({theme}) => ({
 export default function TopNavBar() {
     const navigate = useNavigate();
     const loginUser = useContext(LoginUserContext);
+    const [cartItemLength, setCartItemLength] = useState<number>(0);
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-    const [cartItemLength, setCartItemLength] = useState<number>(0);
 
-    const [open, setOpen] = React.useState(false);
+    const [openDialog, setOpenDialog] = React.useState(false);
 
+    // Dialog
     const handleClickOpen = () => {
-        setOpen(true);
+        setOpenDialog(true);
     };
-
     const handleClose = () => {
-        setOpen(false);
+        setOpenDialog(false);
     };
 
+    // TopNav-Bar
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
-
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
     };
-
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
-
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
 
+    // Search-Bar
     const Search = styled('div')(({theme}) => ({
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
@@ -111,7 +110,6 @@ export default function TopNavBar() {
             width: 'auto',
         },
     }));
-
     const SearchIconWrapper = styled('div')(({theme}) => ({
         padding: theme.spacing(0, 2),
         height: '100%',
@@ -121,7 +119,6 @@ export default function TopNavBar() {
         alignItems: 'center',
         justifyContent: 'center',
     }));
-
     const StyledInputBase = styled(InputBase)(({theme}) => ({
         color: 'inherit',
         width: '100%',
@@ -139,19 +136,19 @@ export default function TopNavBar() {
         },
     }));
 
+    // MenuItem
     const handleLoginClick = () => {
         navigate("/login")
     };
-
     const handleLogoutClick = () => {
         FirebaseAuthService.handleSignOut();
         navigate("/")
     };
-
     const handleShoppingCartClick = () => {
         navigate("/shoppingcart")
     }
 
+    // Call CartItem Api
     const getCartItemListLength = async () => {
         try {
             const data = await CartItemApi.getCartItem();
@@ -168,159 +165,158 @@ export default function TopNavBar() {
     }, [loginUser])
 
     return (
-        <AppBar position='sticky' sx={{backgroundColor: 'black'}}>
-            <Container maxWidth="xl">
-                <Toolbar disableGutters>
-                    <SportsEsportsIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="a"
-                        sx={{
-                            mr: 2,
-                            display: {xs: 'none', md: 'flex'},
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            color: 'inherit',
-                            textDecoration: 'none'
-                        }}
-                    >
-                        GameStation
-                    </Typography>
-
-                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            color="inherit"
-                        >
-                            <MenuIcon/>
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
+        <React.Fragment>
+            <AppBar position='sticky' sx={{backgroundColor: 'black'}}>
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters>
+                        <SportsEsportsIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="a"
                             sx={{
-                                display: {xs: 'block', md: 'none'},
-                            }}>
+                                mr: 2,
+                                display: {xs: 'none', md: 'flex'},
+                                fontFamily: 'monospace',
+                                fontWeight: 700,
+                                color: 'inherit',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            GameStation
+                        </Typography>
 
-                            <MenuItem
-                                key="goHome"
+                        <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
+                            <IconButton
+                                size="large"
+                                aria-label="account of current user"
+                                aria-controls="menu-appbar"
+                                aria-haspopup="true"
+                                onClick={handleOpenNavMenu}
+                                color="inherit"
+                            >
+                                <MenuIcon/>
+                            </IconButton>
+                            <Menu
+                                id="menu-appbar"
+                                anchorEl={anchorElNav}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                open={Boolean(anchorElNav)}
+                                onClose={handleCloseNavMenu}
+                                sx={{
+                                    display: {xs: 'block', md: 'none'},
+                                }}>
+
+                                <MenuItem
+                                    key="goHome"
+                                    onClick={() => {
+                                        navigate("/")
+                                    }}>
+                                    <Typography textAlign="center">Products</Typography>
+                                </MenuItem>
+
+                            </Menu>
+                        </Box>
+                        <SportsEsportsIcon sx={{display: {xs: 'flex', md: 'none'}, mr: 1}}/>
+                        <Typography
+                            variant="h5"
+                            noWrap
+                            component="a"
+                            href="#app-bar-with-responsive-menu"
+                            sx={{
+                                mr: 2,
+                                display: {xs: 'flex', md: 'none'},
+                                flexGrow: 1,
+                                fontFamily: 'monospace',
+                                fontWeight: 700,
+                                color: 'inherit',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            GameStation
+                        </Typography>
+
+                        <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
+                            <Button
                                 onClick={() => {
                                     navigate("/")
-                                }}>
-                                <Typography textAlign="center">Products</Typography>
-                            </MenuItem>
+                                }}
+                                sx={{my: 2, color: 'white', display: 'block'}}
+                            >
+                                Products
+                            </Button>
+                        </Box>
 
-                        </Menu>
-                    </Box>
-                    <SportsEsportsIcon sx={{display: {xs: 'flex', md: 'none'}, mr: 1}}/>
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component="a"
-                        href="#app-bar-with-responsive-menu"
-                        sx={{
-                            mr: 2,
-                            display: {xs: 'flex', md: 'none'},
-                            flexGrow: 1,
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            color: 'inherit',
-                            textDecoration: 'none',
-                        }}
-                    >
-                        GameStation
-                    </Typography>
+                        <Search>
+                            <SearchIconWrapper>
+                                <SearchIcon style={{fontSize: '28px'}}/>
+                            </SearchIconWrapper>
+                            <StyledInputBase
+                                name="search"
+                                placeholder="Search..."
+                                inputProps={{'aria-label': 'search'}}
+                            />
+                        </Search>
 
-                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                        <Button
-                            onClick={() => {
-                                navigate("/")
-                            }}
-                            sx={{my: 2, color: 'white', display: 'block'}}
-                        >
-                            Products
-                        </Button>
-                    </Box>
+                        {/* ----- User Menu -----*/}
+                        <Box sx={{flexGrow: 0}}>
+                            <Tooltip title="Open settings">
+                                {
+                                    loginUser ? (
+                                        <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                            <Avatar alt={loginUser.email} src="/"
+                                                    sx={{width: 36, height: 36, fontSize: '20px'}}/>
+                                        </IconButton>
+                                    ) : loginUser === null ? (
+                                        <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                            <AccountCircleIcon style={{color: 'grey', width: 36, height: 36}}/>
+                                        </IconButton>
+                                    ) : (
+                                        <Box sx={{display: 'flex'}}>
+                                            <Avatar alt="  " src="/"
+                                                    sx={{width: 36, height: 36, fontSize: '20px'}}/>
+                                        </Box>
+                                    )
+                                }
+                            </Tooltip>
 
-                    <Search>
-                        <SearchIconWrapper>
-                            <SearchIcon style={{fontSize: '28px'}}/>
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            name="search"
-                            placeholder="Search..."
-                            inputProps={{'aria-label': 'search'}}
-                        />
-                    </Search>
+                            <Menu
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+                                keepMounted
+                                transformOrigin={{vertical: 'top', horizontal: 'right'}}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                                slotProps={{paper: {elevation: 0, sx: paperStyles}}}
+                            >
+                                {loginUser ? (
+                                    [
+                                        <MenuItem key="avatar" disabled style={{pointerEvents: 'none', opacity: 1}}>
+                                            <ListItemIcon>
+                                                <AccountCircleIcon style={{color: 'grey', width: 24, height: 24}}/>
+                                            </ListItemIcon>
+                                            <Typography textAlign="center">{loginUser.email}</Typography>
+                                        </MenuItem>,
 
-                    {/* ----- loginMenu -----*/}
-                    <Box sx={{flexGrow: 0}}>
-                        <Tooltip title="Open settings">
-                            {
-                                loginUser ? (
-                                    <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                        <Avatar alt={loginUser.email} src="/"
-                                                sx={{width: 36, height: 36, fontSize: '20px'}}/>
-                                    </IconButton>
-                                ) : loginUser === null ? (
-                                    <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                        <AccountCircleIcon style={{color: 'grey', width: 36, height: 36}}/>
-                                    </IconButton>
-                                ) : (
-                                    <Box sx={{display: 'flex'}}>
-                                        <Avatar alt="  " src="/"
-                                                sx={{width: 36, height: 36, fontSize: '20px'}}/>
-                                    </Box>
-                                )
-                            }
-                        </Tooltip>
+                                        <Divider key="divider"/>,
 
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-                            keepMounted
-                            transformOrigin={{vertical: 'top', horizontal: 'right'}}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                            slotProps={{paper: {elevation: 0, sx: paperStyles}}}
-                        >
-                            {loginUser ? (
-                                [
-                                    <MenuItem key="avatar" disabled style={{pointerEvents: 'none', opacity: 1}}>
-                                        <ListItemIcon>
-                                            <AccountCircleIcon style={{color: 'grey', width: 24, height: 24}}/>
-                                        </ListItemIcon>
-                                        <Typography textAlign="center">{loginUser.email}</Typography>
-                                    </MenuItem>,
-
-                                    <Divider key="divider"/>,
-
-                                    <MenuItem key="cart" onClick={handleShoppingCartClick}>
-                                        <ListItemIcon>
-                                            <StyledBadge badgeContent={cartItemLength} color="primary">
-                                                <ShoppingCartIcon fontSize="small"/>
-                                            </StyledBadge>
-                                        </ListItemIcon>
-                                        <Typography textAlign="center">Shopping Cart</Typography>
-                                    </MenuItem>,
-
-                                    <React.Fragment>
+                                        <MenuItem key="cart" onClick={handleShoppingCartClick}>
+                                            <ListItemIcon>
+                                                <StyledBadge badgeContent={cartItemLength} color="primary">
+                                                    <ShoppingCartIcon fontSize="small"/>
+                                                </StyledBadge>
+                                            </ListItemIcon>
+                                            <Typography textAlign="center">Shopping Cart</Typography>
+                                        </MenuItem>,
 
                                         <MenuItem key="sign-out" onClick={handleClickOpen}>
                                             <ListItemIcon>
@@ -328,44 +324,38 @@ export default function TopNavBar() {
                                             </ListItemIcon>
                                             <Typography textAlign="center">Sign Out</Typography>
                                         </MenuItem>
+                                    ]
+                                ) : (
+                                    <MenuItem key="sign-in" onClick={handleLoginClick}>
+                                        <ListItemIcon>
+                                            <Login fontSize="small"/>
+                                        </ListItemIcon>
+                                        <Typography textAlign="center">Sign In</Typography>
+                                    </MenuItem>
+                                )}
+                            </Menu>
 
+                            <Dialog
+                                open={openDialog}
+                                onClose={handleClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Do you want to sign out of GameStation?"}
+                                </DialogTitle>
+                                <DialogActions>
+                                    <Button onClick={handleClose}>No</Button>
+                                    <Button onClick={handleLogoutClick} autoFocus>
+                                        Sign out
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
 
-                                        <Dialog
-                                            open={open}
-                                            onClose={handleClose}
-                                            aria-labelledby="alert-dialog-title"
-                                            aria-describedby="alert-dialog-description"
-                                        >
-
-                                            <DialogTitle id="alert-dialog-title">
-                                                {"Are you sure to sign out?"}
-                                            </DialogTitle>
-
-
-                                            <DialogActions>
-                                                <Button onClick={handleClose}>Cancel</Button>
-                                                <Button onClick={handleLogoutClick} autoFocus>
-                                                    Sure
-                                                </Button>
-                                            </DialogActions>
-
-
-
-                                        </Dialog>
-                                    </React.Fragment>
-                                ]
-                            ) : (
-                                <MenuItem key="sign-in" onClick={handleLoginClick}>
-                                    <ListItemIcon>
-                                        <Login fontSize="small"/>
-                                    </ListItemIcon>
-                                    <Typography textAlign="center">Sign In</Typography>
-                                </MenuItem>
-                            )}
-                        </Menu>
-                    </Box>
-                </Toolbar>
-            </Container>
-        </AppBar>
+                        </Box>
+                    </Toolbar>
+                </Container>
+            </AppBar>
+        </React.Fragment>
     );
 }

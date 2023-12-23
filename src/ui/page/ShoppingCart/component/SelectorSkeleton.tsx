@@ -71,7 +71,7 @@ export default function SelectorSkeleton() {
                         alignItems: 'center',
                     }}
                 >
-                    <div style={{marginTop: '4px'}}>
+                    <div style={{marginTop: '5px'}}>
                         <FacebookCircularProgress color="inherit" size={24}/>
                     </div>
                 </div>
