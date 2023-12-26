@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
 
 import {
     alpha,
-    Badge,
-    BadgeProps,
+    // Badge,
+    // BadgeProps,
     Dialog,
     DialogActions,
     DialogTitle,
@@ -33,8 +33,12 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 
 import {LoginUserContext} from "../../App.tsx";
-import * as CartItemApi from "../../api/CartItemApi.ts"
+// import * as CartItemApi from "../../api/CartItemApi.ts"
 import * as FirebaseAuthService from "../../authService/FirebaseAuthService.ts"
+
+type Props = {
+    onSearchValueChange?: (searchValue: string)=> void;
+}
 
 // Custom Mui Component Style
 const paperStyles = {
@@ -55,24 +59,68 @@ const paperStyles = {
         zIndex: 0,
     },
 };
-const StyledBadge = styled(Badge)<BadgeProps>(({theme}) => ({
-    '& .MuiBadge-badge': {
-        border: `2px solid ${theme.palette.background.paper}`,
-        padding: '0 4px',
+// const StyledBadge = styled(Badge)<BadgeProps>(({theme}) => ({
+//     '& .MuiBadge-badge': {
+//         border: `2px solid ${theme.palette.background.paper}`,
+//         padding: '0 4px',
+//     },
+// }));
+
+// Custom Mui Search-Bar Style
+const Search = styled('div')(({theme}) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0),
+    '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    marginRight: theme.spacing(1),
+    width: '48px',
+    [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(2),
+        width: 'auto',
+    },
+}));
+const SearchIconWrapper = styled('div')(({theme}) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+const StyledInputBase = styled(InputBase)(({theme}) => ({
+    color: 'inherit',
+    width: '100%',
+    '& .MuiInputBase-input': {
+        padding: theme.spacing(1, 1, 1, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        transition: theme.transitions.create('width'),
+        [theme.breakpoints.up('sm')]: {
+            width: '0',
+            '&:focus': {
+                width: '20ch',
+            },
+        },
     },
 }));
 
-export default function TopNavBar() {
-    const navigate = useNavigate();
+export default function TopNavBar({onSearchValueChange}: Props) {
     const loginUser = useContext(LoginUserContext);
-    const [cartItemLength, setCartItemLength] = useState<number>(0);
+    const navigate = useNavigate();
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
     const [openDialog, setOpenDialog] = React.useState(false);
+    const [searchValue, setSearchValue] = useState('');
 
-    // Dialog
+    // const [cartItemLength, setCartItemLength] = useState<number>(0);
+
+    // ---------- Dialog ----------
     const handleClickOpen = () => {
         setOpenDialog(true);
     };
@@ -80,7 +128,7 @@ export default function TopNavBar() {
         setOpenDialog(false);
     };
 
-    // TopNav-Bar
+    // ---------- TopNavBar ----------
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -94,75 +142,43 @@ export default function TopNavBar() {
         setAnchorElUser(null);
     };
 
-    // Search-Bar
-    const Search = styled('div')(({theme}) => ({
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0),
-        '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25),
-        },
-        marginLeft: 0,
-        marginRight: theme.spacing(1),
-        width: '48px',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(2),
-            width: 'auto',
-        },
-    }));
-    const SearchIconWrapper = styled('div')(({theme}) => ({
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }));
-    const StyledInputBase = styled(InputBase)(({theme}) => ({
-        color: 'inherit',
-        width: '100%',
-        '& .MuiInputBase-input': {
-            padding: theme.spacing(1, 1, 1, 0),
-            // vertical padding + font size from searchIcon
-            paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-            transition: theme.transitions.create('width'),
-            [theme.breakpoints.up('sm')]: {
-                width: '0',
-                '&:focus': {
-                    width: '20ch',
-                },
-            },
-        },
-    }));
+    // ---------- Search function ----------
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const value = event.target.value;
+        setSearchValue(value);
+        if (onSearchValueChange){
+            onSearchValueChange(value);
+        }
+    }
 
-    // MenuItem
+    // ---------- MenuItem ----------
     const handleLoginClick = () => {
         navigate("/login")
     };
     const handleLogoutClick = () => {
         FirebaseAuthService.handleSignOut();
+        handleClose();
         navigate("/")
     };
     const handleShoppingCartClick = () => {
         navigate("/shoppingcart")
     }
 
-    // Call CartItem Api
-    const getCartItemListLength = async () => {
-        try {
-            const data = await CartItemApi.getCartItem();
-            setCartItemLength(data.length);
-        } catch (error) {
-            navigate("/error")
-        }
-    }
-
-    useEffect(() => {
-        if (loginUser) {
-            getCartItemListLength();
-        }
-    }, [loginUser])
+    // ---------- Call CartItem Api ----------
+    // const getCartItemListLength = async () => {
+    //     try {
+    //         const data = await CartItemApi.getCartItem();
+    //         setCartItemLength(data.length);
+    //     } catch (error) {
+    //         navigate("/error")
+    //     }
+    // }
+    //
+    // useEffect(() => {
+    //     if (loginUser) {
+    //         getCartItemListLength();
+    //     }
+    // }, [loginUser])
 
     return (
         <React.Fragment>
@@ -260,9 +276,12 @@ export default function TopNavBar() {
                                 <SearchIcon style={{fontSize: '28px'}}/>
                             </SearchIconWrapper>
                             <StyledInputBase
+                                type="search"
                                 name="search"
                                 placeholder="Search..."
                                 inputProps={{'aria-label': 'search'}}
+                                value={searchValue}
+                                onChange={handleSearchChange}
                             />
                         </Search>
 
@@ -311,9 +330,9 @@ export default function TopNavBar() {
 
                                         <MenuItem key="cart" onClick={handleShoppingCartClick}>
                                             <ListItemIcon>
-                                                <StyledBadge badgeContent={cartItemLength} color="primary">
+                                                {/*<StyledBadge badgeContent={cartItemLength} color="primary">*/}
                                                     <ShoppingCartIcon fontSize="small"/>
-                                                </StyledBadge>
+                                                {/*</StyledBadge>*/}
                                             </ListItemIcon>
                                             <Typography textAlign="center">Shopping Cart</Typography>
                                         </MenuItem>,

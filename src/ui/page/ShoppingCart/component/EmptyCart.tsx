@@ -31,7 +31,6 @@ export default function EmptyCart() {
             </h1>
 
             <div style={{ marginTop: '16px' }}>
-
                     <IconButton
                         size="small"
                         disableRipple
@@ -46,8 +45,8 @@ export default function EmptyCart() {
                         <ArrowBackIosNewIcon style={{fontSize: '20px', padding: '0 10px'}}/>
                              Continue Shopping
                     </IconButton>
-
             </div>
+
         </div>
     );
 }

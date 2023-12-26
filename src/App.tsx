@@ -12,20 +12,38 @@ import LoginPage from "./ui/page/LoginPage";
 import ShoppingCart from "./ui/page/ShoppingCart";
 import Checkout from './ui/page/Checkout/index.tsx';
 import ThankYou from "./ui/page/ThankYou";
+import * as CartItemApi from "./api/CartItemApi.ts";
 
 export const LoginUserContext = createContext<UserData | null | undefined>(undefined);
 
+export const CartItemLengthContext = createContext<number>(0);
+
 export default function App() {
     const [loginUser, setLoginUser] = useState<UserData | null | undefined>(undefined);
+    const [cartItemLength, setCartItemLength] = useState<number>(0);
+
+    const getCartItemListLength = async () => {
+        if (loginUser) {
+            const data = await CartItemApi.getCartItem();
+            setCartItemLength(data.length);
+        }
+    }
 
     useEffect(() => {
         FirebaseAuthService.handleOnAuthStateChanged(setLoginUser);
     }, []);
 
+    useEffect(() => {
+        if (loginUser) {
+            getCartItemListLength();
+        }
+    }, [loginUser]);
+
     const router = createBrowserRouter([
         {
             path: "/",
-            element: <ProductListing/>
+            element: <ProductListing/>,
+            errorElement: <ErrorPage/>
         },
         {
             path: "/product/:productId",
@@ -44,19 +62,21 @@ export default function App() {
             element: <Checkout/>
         },
         {
-            path: "/thankyou",
+            path: "/thankyou/:transactionId",
             element: <ThankYou/>
         },
         {
             path: "/error",
-            element: <ErrorPage/>
+            element: <ErrorPage/>,
         }
     ])
 
     return (
         <>
             <LoginUserContext.Provider value={loginUser}>
-                <RouterProvider router={router}/>
+                <CartItemLengthContext.Provider value={cartItemLength}>
+                    <RouterProvider router={router}/>
+                </CartItemLengthContext.Provider>
             </LoginUserContext.Provider>
         </>
     )
