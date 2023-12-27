@@ -36,6 +36,3 @@ export default function Loading() {
         </>
     )
 }
-
-// e.PNG
-// https://pngimg.com/uploads/letter_e/letter_e_PNG13.png
